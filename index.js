@@ -187,13 +187,6 @@ broadlinkMP.prototype.setState = function(state, callback) {
         }
     }
 }
-broadlinkMP.prototype.identify = function(callback) {
-  callback(null);
-};
-
-broadlinkMP.prototype.getOutletInUse = function(callback) {
-    callback(null, 0);
-}
 
 broadlinkMP.prototype.getServices = function() {
     this.log(this.Snumber)
@@ -203,16 +196,11 @@ broadlinkMP.prototype.getServices = function() {
         .setCharacteristic(Characteristic.Model, "MP1")
         .setCharacteristic(Characteristic.SerialNumber, this.Snumber);
 
-    this.OutletService = new Service.Outlet(this.Snumber);
+    this.OutletService = new Service.Switch(this.Snumber);
     this.OutletService
         .getCharacteristic(Characteristic.On)
         .on('get', this.getState.bind(this))
         .on('set', this.setState.bind(this));
-    
-    this.OutletService
-        .getCharacteristic(Characteristic.OutletInUse)
-        .on('get', this.getOutletInUse.bind(this));
-    
         
     return [this.informationService, this.OutletService];
 }
