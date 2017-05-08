@@ -131,7 +131,7 @@ broadlinkMP.prototype.setState = function(Snumber, state, callback) {
                             self.s4_powered = state;
                             break;
                     }
-                    return callback(null, true);
+                    callback(null, true);
                 } else {
                     dev.exit();
                 }
@@ -158,13 +158,13 @@ broadlinkMP.prototype.setState = function(Snumber, state, callback) {
                             self.s4_powered = state;
                             break;
                     }
-                    return callback(null);
+                    callback(null);
                 } else {
                     dev.exit();
                 }
             });
         } else {
-            return callback(null, false)
+            callback(null, false);
         }
     }
 }
