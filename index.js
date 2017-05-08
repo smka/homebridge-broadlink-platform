@@ -182,13 +182,13 @@ broadlinkMP.prototype.getServices = function() {
         
         Snumber = "S"+i;
         var outletUUID = UUIDGen.generate('hap-nodejs:accessories:Snumber');
-        var OutletService = exports.accessory = new Accessory('Snumber', outletUUID);
+        var OutletService  = new Accessory('Snumber', outletUUID);
         var boundSetPowerState = this.setState.bind(this, Snumber);
         var boundGetPowerState = this.getState.bind(this, Snumber);
         
         OutletService.username = "Parm2";
         OutletService.pincode = "031-45-154";
-        OutletService.displayName = "Parm1";
+        OutletService.displayName = "MP1";
         
         OutletService
           .getService(Service.AccessoryInformation)
@@ -197,12 +197,12 @@ broadlinkMP.prototype.getServices = function() {
           .setCharacteristic(Characteristic.SerialNumber, "1.0");
         
         OutletService
-          .addService(Service.Outlet, "Snumber")
+          .addService(Service.Outlet, Snumber)
           .getCharacteristic(Characteristic.On)
           .on('set', boundSetPowerState);
         
         OutletService
-          .getService(Service.Outlet, "Snumber")
+          .getService(Service.Outlet, Snumber)
           .getCharacteristic(Characteristic.On)
           .on('get', boundGetPowerState);
         
