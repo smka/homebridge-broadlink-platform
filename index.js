@@ -199,12 +199,12 @@ broadlinkMP.prototype.getServices = function() {
         OutletService
           .addService(Service.Outlet, "Snumber")
           .getCharacteristic(Characteristic.On)
-          .on('set', boundSetPowerState});
+          .on('set', boundSetPowerState);
         
         OutletService
           .getService(Service.Outlet, "Snumber")
           .getCharacteristic(Characteristic.On)
-          .on('get', boundGetPowerState});
+          .on('get', boundGetPowerState);
         
         this.services.push(OutletService);
     }
