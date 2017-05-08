@@ -182,8 +182,8 @@ broadlinkMP.prototype.getServices = function() {
         var boundSetPowerState = this.setState.bind(this, Snumber);
         var boundGetPowerState = this.getState.bind(this, Snumber);
         OutletService.getCharacteristic(Characteristic.On)
-          .on('get', this.boundGetPowerState)
-          .on('set', this.boundSetPowerState);
+          .on('get', boundGetPowerState)
+          .on('set', boundSetPowerState);
         
         
         this.services.push(OutletService);
