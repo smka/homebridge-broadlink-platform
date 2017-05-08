@@ -171,12 +171,6 @@ broadlinkMP.prototype.setState = function(Snumber, state, callback) {
 
 broadlinkMP.prototype.getServices = function() {
     this.services = [];
-    var accessoryInformationService = new Service.AccessoryInformation()
-            .setCharacteristic(Characteristic.Manufacturer, 'Broadlink')
-            .setCharacteristic(Characteristic.Model, 'MP1')
-
-    this.services.push(accessoryInformationService);
-    
     var Snumber;
     for (var i = 1; i < 5; i++) {
         
@@ -202,7 +196,7 @@ broadlinkMP.prototype.getServices = function() {
           .on('set', boundSetPowerState);
         
         OutletService
-          .getService(Service.Outlet, Snumber)
+          .getService(Service.Outlet)
           .getCharacteristic(Characteristic.On)
           .on('get', boundGetPowerState);
         
