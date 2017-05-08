@@ -69,8 +69,8 @@ broadlinkMP.prototype.getState = function(callback) {
 
     b.on("deviceReady", (dev) => {
         if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-            dev.check_power();
             self.log("checking power for " + self.Snumber);
+            dev.check_power();
             switch(self.Snumber) {
                 case "S1":
                     dev.on("s1_power", (s1) => {
@@ -103,6 +103,7 @@ broadlinkMP.prototype.getState = function(callback) {
             }
 
         } else {
+            self.log("not MP1!");
             dev.exit();
         }
     });
@@ -143,16 +144,16 @@ broadlinkMP.prototype.setState = function(state, callback) {
                     dev.exit();
                     switch(self.Snumber) {
                         case "S1":
-                            self.s1_powered = state;
+                            self.s1_powered = true;
                             break;
                         case "S2":
-                            self.s2_powered = state;
+                            self.s2_powered = true;
                             break;
                         case "S3":
-                            self.s3_powered = state;
+                            self.s3_powered = true;
                             break;
                         case "S4":
-                            self.s4_powered = state;
+                            self.s4_powered = true;
                             break;
                     }
                     return callback(null, true);
@@ -170,19 +171,19 @@ broadlinkMP.prototype.setState = function(state, callback) {
                     dev.exit();
                     switch(self.Snumber) {
                         case "S1":
-                            self.s1_powered = state;
+                            self.s1_powered = false;
                             break;
                         case "S2":
-                            self.s2_powered = state;
+                            self.s2_powered = false;
                             break;
                         case "S3":
-                            self.s3_powered = state;
+                            self.s3_powered = false;
                             break;
                         case "S4":
-                            self.s4_powered = state;
+                            self.s4_powered = false;
                             break;
                     }
-                    return callback(null);
+                    return callback(null, false);
                 } else {
                     dev.exit();
                 }
