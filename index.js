@@ -25,6 +25,7 @@ broadlinkMPplatform.prototype.accessories = function(callback) {
         SPs.push(newSP)
     }
     callback(SPs);
+    
 }
     
 function broadlinkMP(log, ip, mac, name, Snumber) {
@@ -210,5 +211,7 @@ broadlinkMP.prototype.getServices = function() {
       .setCharacteristic(Characteristic.Model, "MP1")
       .setCharacteristic(Characteristic.SerialNumber, this.name);
         
+    this.api.registerPlatformAccessories("homebridge-broadlink-mp", "broadlinkMP", [platformAccessory]);
+    
     return [platformAccessory];
 }
