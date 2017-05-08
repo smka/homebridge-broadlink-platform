@@ -174,10 +174,10 @@ broadlinkMP.prototype.setState = function(state, callback) {
 
 broadlinkMP.prototype.getServices = function() {
     this.services = [];
-    var Snumber;
     for (var i = 1; i < 5; i++) {
         
         this.Snumber = "S"+i;
+        var Snumber = this.Snumber;
         var outletUUID = UUIDGen.generate('hap-nodejs:accessories:' + Snumber);
         var OutletService  = new Accessory(Snumber, outletUUID);
         
