@@ -164,8 +164,6 @@ broadlinkMP.prototype.setState = function(Snumber, state, callback) {
                     dev.exit();
                 }
             });
-        } else {
-            return callback(null, false);
         }
     }
 }
