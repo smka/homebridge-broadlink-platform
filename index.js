@@ -1,9 +1,10 @@
-var Service, Characteristic;
+var Service, Characteristic, UUIDGen;
 var broadlink = require('broadlinkjs-sm');
 
 module.exports = function(homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
+    UUIDGen = homebridge.hap.uuid;
     homebridge.registerAccessory("homebridge-broadlink-mp", "broadlinkMP", broadlinkMP);
 }
 
@@ -168,6 +169,7 @@ broadlinkMP.prototype.setState = function(Snumber, state, callback) {
 }
 
 broadlinkMP.prototype.getServices = function() {
+    var outletUUID = uuid.generate('hap-nodejs:accessories:MP');
     this.services = [];
     var accessoryInformationService = new Service.AccessoryInformation()
             .setCharacteristic(Characteristic.Manufacturer, 'Broadlink')
@@ -178,7 +180,7 @@ broadlinkMP.prototype.getServices = function() {
     var Snumber;
     for (var i = 1; i < 5; i++) {
         Snumber = "S"+i;
-        var OutletService = new Service.Outlet(Snumber, Snumber);
+        var OutletService = new Service.Outlet(Snumber, outletUUID);
         var boundSetPowerState = this.setState.bind(this, Snumber);
         var boundGetPowerState = this.getState.bind(this, Snumber);
         OutletService.getCharacteristic(Characteristic.On)
