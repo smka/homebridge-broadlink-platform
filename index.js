@@ -43,8 +43,8 @@ function broadlinkMP(log, config, api) {
         var OutletService = new Service.Outlet("S"+i);
         Snumber = "S"+i;
         OutletService.getCharacteristic(Characteristic.On)
-          .on('get', this.getState(Snumber))
-          .on('set', this.setState(Snumber));
+          .on('get', this.getState.bind(this, Snumber))
+          .on('set', this.setState.bind(this, Snumber));
         
         var accessoryInformationService = new Service.AccessoryInformation()
             .setCharacteristic(Characteristic.Manufacturer, 'Broadlink')
@@ -99,7 +99,7 @@ broadlinkMP.prototype.getState = function(Snumber, callback) {
     });
 }
          
-broadlinkMP.prototype.setState = function(state, Snumber, callback) {
+broadlinkMP.prototype.setState = function(Snumber, state, callback) {
     var self = this
     var b = new broadlink();
     var socketPowered, Snum;
