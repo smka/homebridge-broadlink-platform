@@ -36,27 +36,7 @@ function broadlinkMP(log, config, api) {
         }
         return mb;
     }
-    this.services = [];
     
-    var accessoryInformationService = new Service.AccessoryInformation()
-            .setCharacteristic(Characteristic.Manufacturer, 'Broadlink')
-            .setCharacteristic(Characteristic.Model, 'MP1')
-            .setCharacteristic(Characteristic.SerialNumber, '1.0')
-
-    this.services.push(accessoryInformationService);
-    
-    var Snumber;
-    for (var i = 1; i < 5; i++) {
-        Snumber = "S"+i;
-        var OutletService = new Service.Outlet(Snumber, Snumber);
-        
-        OutletService.getCharacteristic(Characteristic.On)
-          .on('get', this.getState.bind(this, Snumber))
-          .on('set', this.setState.bind(this, Snumber));
-        
-        
-        this.services.push(OutletService);
-    }
 
 }
 
@@ -188,5 +168,25 @@ broadlinkMP.prototype.setState = function(Snumber, state, callback) {
 }
 
 broadlinkMP.prototype.getServices = function() {
+    this.services = [];
+    var accessoryInformationService = new Service.AccessoryInformation()
+            .setCharacteristic(Characteristic.Manufacturer, 'Broadlink')
+            .setCharacteristic(Characteristic.Model, 'MP1')
+
+    this.services.push(accessoryInformationService);
+    
+    var Snumber;
+    for (var i = 1; i < 5; i++) {
+        Snumber = "S"+i;
+        var OutletService = new Service.Outlet(Snumber, Snumber);
+        var boundSetPowerState = this.setState.bind(this, Snumber);
+        var boundGetPowerState = this.getState.bind(this, Snumber);
+        OutletService.getCharacteristic(Characteristic.On)
+          .on('get', this.boundGetPowerState)
+          .on('set', this.boundSetPowerState);
+        
+        
+        this.services.push(OutletService);
+    }
     return this.services;
 }
