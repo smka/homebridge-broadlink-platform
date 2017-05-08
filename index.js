@@ -79,17 +79,20 @@ broadlinkMP.prototype.getState = function(callback) {
                         self.s1_powered = s1;
                         status = s1;
                     });
+                    break;
                 case "S2":
                     dev.on("s2_power", (s2) => {
                         self.log("s2 power is on " + s2);
                         self.s2_powered = s2;
                         status = s2;
                     });
+                    break;
                 case "S3":
                     dev.on("s3_power", (s3) => {
                         self.log("s3 power is on " + s3);
                         status = s3;
                     });
+                    break;
                 case "S4":
                     dev.on("s4_power", (s4) => {
                         self.log("s4 power is on " + s4);
@@ -97,6 +100,7 @@ broadlinkMP.prototype.getState = function(callback) {
                         status = s4;
                         
                     });
+                    break;
             }
             return callback(null, status);
         } else {
