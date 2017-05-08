@@ -75,6 +75,11 @@ broadlinkMP.prototype.getState = function(callback) {
             switch(self.Snumber) {
                 case "S1":
                     dev.on("s1_power", (s1) => {
+                        dev.removeListener('s1_power',  (s1) => {
+                            self.log("s1 power is on " + s1);
+                            self.s1_powered = s1;
+                            return callback(null, s1);
+                        });
                     });
                     dev.on("s1_power", (s1) => {
                         self.log("s1 power is on " + s1);
@@ -84,6 +89,11 @@ broadlinkMP.prototype.getState = function(callback) {
                     break;
                 case "S2":
                     dev.on("s2_power", (s2) => {
+                        dev.removeListener("s2_power", (s2) => {
+                            self.log("s2 power is on " + s2);
+                            self.s2_powered = s2;
+                            return callback(null, s2);
+                        });
                     });
                     dev.on("s2_power", (s2) => {
                         self.log("s2 power is on " + s2);
@@ -93,6 +103,10 @@ broadlinkMP.prototype.getState = function(callback) {
                     break;
                 case "S3":
                     dev.on("s3_power", (s3) => {
+                        dev.removeListener("s3_power", (s3) => {
+                            self.log("s3 power is on " + s3);
+                            return callback(null, s3);
+                        });
                     });
                     dev.on("s3_power", (s3) => {
                         self.log("s3 power is on " + s3);
@@ -101,6 +115,11 @@ broadlinkMP.prototype.getState = function(callback) {
                     break;
                 case "S4":
                     dev.on("s4_power", (s4) => {
+                        dev.removeListener("s4_power", (s4) => {
+                            self.log("s4 power is on " + s4);
+                            self.s4_powered = s4;
+                            return callback(null, s4);
+                        });
                     });
                     dev.on("s4_power", (s4) => {
                         self.log("s4 power is on " + s4);
