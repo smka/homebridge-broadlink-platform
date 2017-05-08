@@ -18,19 +18,20 @@ function broadlinkMPplatform(log, config, api) {
 
 broadlinkMPplatform.prototype.accessories = function(callback) {
     var SPs = [];
+    var Snumber
     for (var i = 1; i < 5; i++) { 
-        var Snumber = "S"+i;
-        var newSP = new broadlinkMP(this.log, this.config, Snumber);
+        Snumber = "S"+i;
+        var newSP = new broadlinkMP(this.log, this.ip, this.mac, this.name, Snumber);
         SPs.push(newSP)
     }
     callback(SPs);
 }
     
-function broadlinkMP(log, config, Snumber) {
+function broadlinkMP(log, ip,, mac, name, Snumber) {
     this.log = log;
-    this.ip = config['ip'];
-    this.name = config['name'];
-    this.mac = config['mac'];
+    this.ip = ip;
+    this.name = name
+    this.mac = mac;
     this.Snumber = Snumber;
     this.s1_powered = false;
     this.s2_powered = false;
