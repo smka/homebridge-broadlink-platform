@@ -195,27 +195,17 @@ broadlinkMP.prototype.setState = function(state, callback) {
 
 broadlinkMP.prototype.getServices = function() {
     this.log(this.Snumber)
-    const platformAccessory = new Accessory(this.name, UUIDGen.generate('Broadlink:MP1:'+this.name), 7 /* Accessory.Categories.OUTLET */);
-    platformAccessory.addService(Service.Outlet, this.name);
-    platformAccessory.context.deviceId = 'Broadlink:MP1:'+this.name;
-    
-    const OutletService = platformAccessory.getService(Service.Outlet);
-    OutletService
-        .getCharacteristic(Characteristic.On)
+    this.log(this.name)
+    this.service = new Service.Switch(this.name);
+
+    this.service.getCharacteristic(Characteristic.On)
         .on('get', this.getState.bind(this))
         .on('set', this.setState.bind(this));
+
+    this.accessoryInformationService = new Service.AccessoryInformation()
+        .setCharacteristic(Characteristic.Manufacturer, 'Broadlink')
+        .setCharacteristic(Characteristic.Model, 'MP1')
+        .setCharacteristic(Characteristic.SerialNumber, '1.0')
     
-    platformAccessory.displayName = this.name;
-    OutletService.setCharacteristic(Characteristic.Name, this.name);
-    
-    const infoService = platformAccessory.getService(Service.AccessoryInformation);
-    infoService
-      .setCharacteristic(Characteristic.Name, this.name)
-      .setCharacteristic(Characteristic.Manufacturer, "Broadlink")
-      .setCharacteristic(Characteristic.Model, "MP1")
-      .setCharacteristic(Characteristic.SerialNumber, this.name);
-        
-    this.api.registerPlatformAccessories("homebridge-broadlink-mp", "broadlinkMP", [platformAccessory]);
-    
-    return [platformAccessory];
+    return [service];
 }
