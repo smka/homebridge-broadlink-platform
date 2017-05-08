@@ -30,7 +30,7 @@ broadlinkMPplatform.prototype.accessories = function(callback) {
 function broadlinkMP(log, ip, mac, name, Snumber) {
     this.log = log;
     this.ip = ip;
-    this.name = name
+    this.name = Snumber
     this.mac = mac;
     this.Snumber = Snumber;
     this.s1_powered = false;
@@ -196,7 +196,7 @@ broadlinkMP.prototype.getServices = function() {
         .setCharacteristic(Characteristic.Model, "MP1")
         .setCharacteristic(Characteristic.SerialNumber, this.Snumber);
 
-    this.OutletService = new Service.Switch(this.Snumber);
+    this.OutletService = new Service.Switch(this.name);
     this.OutletService
         .getCharacteristic(Characteristic.On)
         .on('get', this.getState.bind(this))
