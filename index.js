@@ -10,8 +10,8 @@ module.exports = function(homebridge) {
 }
 function broadlinkMPplatform(log, config, api) {
     this.log = log;
+    this.api = api;
     this.ip = config['ip'];
-    this.name = config['name'];
     this.mac = config['mac'];
 
 }
