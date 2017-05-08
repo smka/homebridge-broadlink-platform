@@ -84,7 +84,7 @@ broadlinkMP.prototype.getState = function(callback, Snumber) {
     });
 }
          
-broadlinkMP.prototype.setState = function(Snumber, state, callback) {
+broadlinkMP.prototype.setState = function(Snumber, callback, state) {
     var self = this
     self.log("state="+state+"_callback="+callback+"_Snumber="+Snumber)
     var b = new broadlink();
@@ -164,6 +164,8 @@ broadlinkMP.prototype.setState = function(Snumber, state, callback) {
                     dev.exit();
                 }
             });
+        } else {
+            return callback(null, false);
         }
     }
 }
