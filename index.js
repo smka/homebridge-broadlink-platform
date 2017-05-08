@@ -4,7 +4,6 @@ var broadlink = require('broadlinkjs-sm');
 module.exports = function(homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
-
     homebridge.registerAccessory("homebridge-broadlink-mp", "broadlinkMP", broadlinkMP);
 }
 
@@ -38,6 +37,14 @@ function broadlinkMP(log, config, api) {
         return mb;
     }
     this.services = [];
+    
+    var accessoryInformationService = new Service.AccessoryInformation()
+            .setCharacteristic(Characteristic.Manufacturer, 'Broadlink')
+            .setCharacteristic(Characteristic.Model, 'MP1')
+            .setCharacteristic(Characteristic.SerialNumber, '1.0')
+
+    this.services.push(accessoryInformationService);
+    
     var Snumber;
     for (var i = 1; i < 5; i++) {
         Snumber = "S"+i;
@@ -47,12 +54,7 @@ function broadlinkMP(log, config, api) {
           .on('get', this.getState.bind(this, Snumber))
           .on('set', this.setState.bind(this, Snumber));
         
-        var accessoryInformationService = new Service.AccessoryInformation()
-            .setCharacteristic(Characteristic.Manufacturer, 'Broadlink')
-            .setCharacteristic(Characteristic.Model, 'MP1_'+ Snumber)
-            .setCharacteristic(Characteristic.SerialNumber, '1.0')
-
-        this.services.push(accessoryInformationService);
+        
         this.services.push(OutletService);
     }
 
