@@ -105,7 +105,6 @@ broadlinkMP.prototype.getState = function(callback) {
          
 broadlinkMP.prototype.setState = function(state, callback) {
     var self = this
-    self.log("state="+state+"_callback="+callback+"_Snumber="+Snumber)
     var b = new broadlink();
     var socketPowered, Snum;
     b.discover();
@@ -192,6 +191,10 @@ broadlinkMP.prototype.identify = function(callback) {
   callback(null);
 };
 
+broadlinkMP.prototype.getOutletInUse = function(callback) {
+    callback(null, 0);
+}
+
 broadlinkMP.prototype.getServices = function() {
     this.log(this.Snumber)
     this.informationService = new Service.AccessoryInformation();
@@ -205,6 +208,11 @@ broadlinkMP.prototype.getServices = function() {
         .getCharacteristic(Characteristic.On)
         .on('get', this.getState.bind(this))
         .on('set', this.setState.bind(this));
+    
+    this.OutletService
+        .getCharacteristic(Characteristic.OutletInUse)
+        .on('get', this.getOutletInUse.bind(this));
+    
         
     return [this.informationService, this.OutletService];
 }
