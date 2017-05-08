@@ -43,8 +43,8 @@ function broadlinkMP(log, config, api) {
         var OutletService = new Service.Outlet("S"+i);
         Snumber = "S"+i;
         OutletService.getCharacteristic(Characteristic.On)
-          .on('get', this.getState(Snumber).bind(this))
-          .on('set', this.setState(Snumber).bind(this));
+          .on('get', this.getState(Snumber))
+          .on('set', this.setState(Snumber));
         
         var accessoryInformationService = new Service.AccessoryInformation()
             .setCharacteristic(Characteristic.Manufacturer, 'Broadlink')
