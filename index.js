@@ -6,14 +6,32 @@ module.exports = function(homebridge) {
     Accessory = homebridge.platformAccessory;
     Characteristic = homebridge.hap.Characteristic;
     UUIDGen = homebridge.hap.uuid;
-    homebridge.registerPlatform("homebridge-broadlink-mp", "broadlinkMP", broadlinkMP);
+    homebridge.registerPlatform("homebridge-broadlink-mp", "broadlinkMP", broadlinkMPplatform);
 }
-
-function broadlinkMP(log, config, api) {
+function broadlinkMPplatform(log, config, api) {
     this.log = log;
     this.ip = config['ip'];
     this.name = config['name'];
     this.mac = config['mac'];
+
+}
+
+broadlinkMPplatform.prototype.accessories = function(callback) {
+    var SPs = [];
+    for (var i = 1; i < 5; i++) { 
+        var Snumber = "S"+i;
+        var newSP = new broadlinkMP(this.log, this.config, Snumber);
+        SPs.push(newSP)
+    }
+    callback(SPs);
+}
+    
+function broadlinkMP(log, config, Snumber) {
+    this.log = log;
+    this.ip = config['ip'];
+    this.name = config['name'];
+    this.mac = config['mac'];
+    this.Snumber = Snumber;
     this.s1_powered = false;
     this.s2_powered = false;
     this.s3_powered = false;
@@ -44,15 +62,14 @@ function broadlinkMP(log, config, api) {
 
 broadlinkMP.prototype.getState = function(callback) {
     var self = this
-    var Snumber = this.Snumber
     var b = new broadlink();
     b.discover();
 
     b.on("deviceReady", (dev) => {
         if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
             dev.check_power();
-            self.log("checking power for " + Snumber);
-            switch(Snumber) {
+            self.log("checking power for " + self.Snumber);
+            switch(self.Snumber) {
                 case "S1":
                     dev.on("s1_power", (s1) => {
                         self.log("s1 power is on " + s1);
@@ -87,13 +104,12 @@ broadlinkMP.prototype.getState = function(callback) {
          
 broadlinkMP.prototype.setState = function(state, callback) {
     var self = this
-    var Snumber = this.Snumber
     self.log("state="+state+"_callback="+callback+"_Snumber="+Snumber)
     var b = new broadlink();
     var socketPowered, Snum;
     b.discover();
-    self.log("set " + Snumber + " state to " + state);
-    switch(Snumber) {
+    self.log("set " + self.Snumber + " state to " + state);
+    switch(self.Snumber) {
         case "S1":
             socketPowered = self.s1_powered;
             Snum = 1;
@@ -118,9 +134,9 @@ broadlinkMP.prototype.setState = function(state, callback) {
             b.on("deviceReady", (dev) => {
                 if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
                     dev.set_power(Snum, 1);
-                    self.log(Snumber + "is ON!");
+                    self.log(self.Snumber + "is ON!");
                     dev.exit();
-                    switch(Snumber) {
+                    switch(self.Snumber) {
                         case "S1":
                             self.s1_powered = state;
                             break;
@@ -144,10 +160,10 @@ broadlinkMP.prototype.setState = function(state, callback) {
         if (this.powered) {
             b.on("deviceReady", (dev) => {
                 if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                    self.log(Snumber + "is OFF!");
+                    self.log(self.Snumber + "is OFF!");
                     dev.set_power(Snum, 0);
                     dev.exit();
-                    switch(Snumber) {
+                    switch(self.Snumber) {
                         case "S1":
                             self.s1_powered = state;
                             break;
@@ -171,43 +187,22 @@ broadlinkMP.prototype.setState = function(state, callback) {
         }
     }
 }
+broadlinkMP.prototype.identify = function(callback) {
+  callback(null);
+};
 
 broadlinkMP.prototype.getServices = function() {
-    this.services = [];
-    
-    for (var i = 1; i < 5; i++) {    
-        this.Snumber = "S"+i;
-        var Snumber = this.Snumber;
-        var platformAccessory = new Accessory(Snumber, UUIDGen.generate('hap-nodejs:accessories:'+Snumber), 7 /* Accessory.Categories.OUTLET */);
-        platformAccessory.addService(Service.Outlet, Snumber);
+    this.informationService = new Service.AccessoryInformation();
+    this.informationService
+        .setCharacteristic(Characteristic.Manufacturer, "Broadlink")
+        .setCharacteristic(Characteristic.Model, "MP1")
+        .setCharacteristic(Characteristic.SerialNumber, Snumber);
+
+    this.OutletService = new Service.Outlet(this.Snumber);
+    this.OutletService
+        .getCharacteristic(Characteristic.On)
+        .on('get', this.getState.bind(this))
+        .on('set', this.setState.bind(this));
         
-        identify (callback) {
-            // TODO
-            callback();
-          }
-        
-        const OutletService = platformAccessory.getService(Service.Outlet);
-        OutletService.username = Snumber;
-        OutletService.pincode = "031-45-154";
-        OutletService.displayName = Snumber;
-        
-        OutletService
-          .getService(Service.AccessoryInformation)
-          .setCharacteristic(Characteristic.Manufacturer, "Broadlink")
-          .setCharacteristic(Characteristic.Model, "MP1")
-          .setCharacteristic(Characteristic.SerialNumber, Snumber);
-        
-        OutletService
-          .addService(Service.Outlet, Snumber)
-          .getCharacteristic(Characteristic.On)
-          .on('set', this.setState.bind(this));
-        
-        OutletService
-          .getService(Service.Outlet)
-          .getCharacteristic(Characteristic.On)
-          .on('get', this.getState.bind(this));
-        
-        this.services.push(OutletService);
-    }
-    return this.services;
+    return [this.informationService, this.OutletService];
 }
