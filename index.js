@@ -7,22 +7,26 @@ module.exports = function(homebridge) {
     Characteristic = homebridge.hap.Characteristic;
     UUIDGen = homebridge.hap.uuid;
     homebridge.registerPlatform("homebridge-broadlink-mp", "broadlinkMP", broadlinkMPplatform);
+    homebridge.registerAccessory("homebridge-broadlink-mp", "broadlinkMP", broadlinkMP);
 }
 function broadlinkMPplatform(log, config, api) {
     this.log = log;
     this.api = api;
     this.ip = config['ip'];
     this.mac = config['mac'];
+    
 
 }
 
 broadlinkMPplatform.prototype.accessories = function(callback) {
-    var SPs = [];
+    this.accessories = [];
+    this.SPs = [];
     var Snumber
     for (var i = 1; i < 5; i++) { 
         Snumber = "S"+i;
         var newSP = new broadlinkMP(this.log, this.ip, this.mac, this.name, Snumber);
-        SPs.push(newSP)
+        this.SPs.push(newSP)
+        this.accessories.push(newSP)
     }
     callback(SPs);
     
