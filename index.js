@@ -207,5 +207,5 @@ broadlinkMP.prototype.getServices = function() {
         .setCharacteristic(Characteristic.Model, 'MP1')
         .setCharacteristic(Characteristic.SerialNumber, '1.0')
     
-    return [service];
+    return [this.service, this.accessoryInformationService];
 }
