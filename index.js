@@ -40,15 +40,16 @@ function broadlinkMP(log, config, api) {
     this.services = [];
     var Snumber;
     for (var i = 1; i < 5; i++) {
-        var OutletService = new Service.Outlet("S"+i);
         Snumber = "S"+i;
+        var OutletService = new Service.Outlet(Snumber, Snumber);
+        
         OutletService.getCharacteristic(Characteristic.On)
           .on('get', this.getState.bind(this, Snumber))
           .on('set', this.setState.bind(this, Snumber));
         
         var accessoryInformationService = new Service.AccessoryInformation()
             .setCharacteristic(Characteristic.Manufacturer, 'Broadlink')
-            .setCharacteristic(Characteristic.Model, 'MP1_'+'S'+i)
+            .setCharacteristic(Characteristic.Model, 'MP1_'+ Snumber)
             .setCharacteristic(Characteristic.SerialNumber, '1.0')
 
         this.services.push(accessoryInformationService);
