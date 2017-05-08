@@ -64,13 +64,13 @@ broadlinkMP.prototype.getState = function(Snumber, callback) {
                         self.s2_powered = s2;
                         return callback(null, s2);
                     });
-                case "S1":
+                case "S3":
                     dev.on("s3_power", (s3) => {
                         self.log("s3 power is on " + s3);
                         self.s3_powered = s3;
                         return callback(null, s3);
                     });
-                case "S1":
+                case "S4":
                     dev.on("s4_power", (s4) => {
                         self.log("s4 power is on " + s4);
                         self.s4_powered = s4;
@@ -91,19 +91,19 @@ broadlinkMP.prototype.setState = function(Snumber, state, callback) {
     b.discover();
     self.log("set " + Snumber + " state to " + state);
     switch(Snumber) {
-        case S1:
+        case "S1":
             socketPowered = self.s1_powered;
             Snum = 1;
             break;
-        case S2:
+        case "S2":
             socketPowered = self.s2_powered;
             Snum = 2;
             break;
-        case S3:
+        case "S3":
             socketPowered = self.s3_powered;
             Snum = 3;
             break;
-        case S4:
+        case "S4":
             socketPowered = self.s4_powered;
             Snum = 4;
             break;
@@ -118,16 +118,16 @@ broadlinkMP.prototype.setState = function(Snumber, state, callback) {
                     self.log(Snumber + "is ON!");
                     dev.exit();
                     switch(Snumber) {
-                        case S1:
+                        case "S1":
                             self.s1_powered = state;
                             break;
-                        case S2:
+                        case "S2":
                             self.s2_powered = state;
                             break;
-                        case S3:
+                        case "S3":
                             self.s3_powered = state;
                             break;
-                        case S4:
+                        case "S4":
                             self.s4_powered = state;
                             break;
                     }
@@ -145,16 +145,16 @@ broadlinkMP.prototype.setState = function(Snumber, state, callback) {
                     dev.set_power(Snum, 0);
                     dev.exit();
                     switch(Snumber) {
-                        case S1:
+                        case "S1":
                             self.s1_powered = state;
                             break;
-                        case S2:
+                        case "S2":
                             self.s2_powered = state;
                             break;
-                        case S3:
+                        case "S3":
                             self.s3_powered = state;
                             break;
-                        case S4:
+                        case "S4":
                             self.s4_powered = state;
                             break;
                     }
