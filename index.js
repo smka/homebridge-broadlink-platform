@@ -27,7 +27,7 @@ broadlinkMPplatform.prototype.accessories = function(callback) {
     callback(SPs);
 }
     
-function broadlinkMP(log, ip,, mac, name, Snumber) {
+function broadlinkMP(log, ip, mac, name, Snumber) {
     this.log = log;
     this.ip = ip;
     this.name = name
