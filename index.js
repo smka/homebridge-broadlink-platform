@@ -75,34 +75,41 @@ broadlinkMP.prototype.getState = function(callback) {
             switch(self.Snumber) {
                 case "S1":
                     dev.on("s1_power", (s1) => {
+                    });
+                    dev.on("s1_power", (s1) => {
                         self.log("s1 power is on " + s1);
                         self.s1_powered = s1;
-                        status = s1;
+                        return callback(null, s1);
                     });
                     break;
                 case "S2":
                     dev.on("s2_power", (s2) => {
+                    });
+                    dev.on("s2_power", (s2) => {
                         self.log("s2 power is on " + s2);
                         self.s2_powered = s2;
-                        status = s2;
+                        return callback(null, s2);
                     });
                     break;
                 case "S3":
                     dev.on("s3_power", (s3) => {
+                    });
+                    dev.on("s3_power", (s3) => {
                         self.log("s3 power is on " + s3);
-                        status = s3;
+                        return callback(null, s3);
                     });
                     break;
                 case "S4":
                     dev.on("s4_power", (s4) => {
+                    });
+                    dev.on("s4_power", (s4) => {
                         self.log("s4 power is on " + s4);
                         self.s4_powered = s4;
-                        status = s4;
-                        
+                        return callback(null, s4);
                     });
                     break;
             }
-            return callback(null, status);
+            
         } else {
             dev.exit();
         }
@@ -133,7 +140,7 @@ broadlinkMP.prototype.setState = function(state, callback) {
             Snum = 4;
             break;
     }
-    if (state) {
+    if (state == 1) {
         if (socketPowered) {
             return callback(null, true)
         } else {
