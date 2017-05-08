@@ -42,8 +42,9 @@ function broadlinkMP(log, config, api) {
 
 }
 
-broadlinkMP.prototype.getState = function(callback, Snumber) {
+broadlinkMP.prototype.getState = function(callback) {
     var self = this
+    var Snumber = this.Snumber
     var b = new broadlink();
     b.discover();
 
@@ -84,8 +85,9 @@ broadlinkMP.prototype.getState = function(callback, Snumber) {
     });
 }
          
-broadlinkMP.prototype.setState = function(Snumber, callback, state) {
+broadlinkMP.prototype.setState = function(state, callback) {
     var self = this
+    var Snumber = this.Snumber
     self.log("state="+state+"_callback="+callback+"_Snumber="+Snumber)
     var b = new broadlink();
     var socketPowered, Snum;
@@ -175,7 +177,7 @@ broadlinkMP.prototype.getServices = function() {
     var Snumber;
     for (var i = 1; i < 5; i++) {
         
-        Snumber = "S"+i;
+        this.Snumber = "S"+i;
         var outletUUID = UUIDGen.generate('hap-nodejs:accessories:' + Snumber);
         var OutletService  = new Accessory(Snumber, outletUUID);
         
@@ -192,12 +194,12 @@ broadlinkMP.prototype.getServices = function() {
         OutletService
           .addService(Service.Outlet, Snumber)
           .getCharacteristic(Characteristic.On)
-          .on('set', this.setState(Snumber));
+          .on('set', this.setState.bind(this));
         
         OutletService
           .getService(Service.Outlet)
           .getCharacteristic(Characteristic.On)
-          .on('get', this.getState(Snumber));
+          .on('get', this.getState.bind(this));
         
         this.services.push(OutletService);
     }
