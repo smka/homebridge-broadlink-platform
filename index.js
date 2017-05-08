@@ -192,11 +192,12 @@ broadlinkMP.prototype.identify = function(callback) {
 };
 
 broadlinkMP.prototype.getServices = function() {
+    this.log(this.Snumber)
     this.informationService = new Service.AccessoryInformation();
     this.informationService
         .setCharacteristic(Characteristic.Manufacturer, "Broadlink")
         .setCharacteristic(Characteristic.Model, "MP1")
-        .setCharacteristic(Characteristic.SerialNumber, Snumber);
+        .setCharacteristic(Characteristic.SerialNumber, this.Snumber);
 
     this.OutletService = new Service.Outlet(this.Snumber);
     this.OutletService
