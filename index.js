@@ -28,7 +28,7 @@ broadlinkMPplatform.prototype.accessories = function(callback) {
         this.SPs.push(newSP)
         this.accessories.push(newSP)
     }
-    callback(SPs);
+    callback(this.accessories);
     
 }
     
