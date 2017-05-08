@@ -3,10 +3,10 @@ var broadlink = require('broadlinkjs-sm');
 
 module.exports = function(homebridge) {
     Service = homebridge.hap.Service;
-    Accessory = homebridge.hap.Accessory;
+    Accessory = homebridge.platformAccessory;
     Characteristic = homebridge.hap.Characteristic;
     UUIDGen = homebridge.hap.uuid;
-    homebridge.registerAccessory("homebridge-broadlink-mp", "broadlinkMP", broadlinkMP);
+    homebridge.registerPlatform("homebridge-broadlink-mp", "broadlinkMP", broadlinkMP);
 }
 
 function broadlinkMP(log, config, api) {
@@ -174,13 +174,19 @@ broadlinkMP.prototype.setState = function(state, callback) {
 
 broadlinkMP.prototype.getServices = function() {
     this.services = [];
-    for (var i = 1; i < 5; i++) {
-        
+    
+    for (var i = 1; i < 5; i++) {    
         this.Snumber = "S"+i;
         var Snumber = this.Snumber;
-        var outletUUID = UUIDGen.generate('hap-nodejs:accessories:' + Snumber);
-        var OutletService  = new Accessory(Snumber, outletUUID);
+        var platformAccessory = new Accessory(Snumber, UUIDGen.generate('hap-nodejs:accessories:'+Snumber), 7 /* Accessory.Categories.OUTLET */);
+        platformAccessory.addService(Service.Outlet, Snumber);
         
+        identify (callback) {
+            // TODO
+            callback();
+          }
+        
+        const OutletService = platformAccessory.getService(Service.Outlet);
         OutletService.username = Snumber;
         OutletService.pincode = "031-45-154";
         OutletService.displayName = Snumber;
