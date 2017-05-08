@@ -1,4 +1,4 @@
-var Service, Characteristic, UUIDGen;
+var Service, Characteristic, UUIDGen, Accessory;
 var broadlink = require('broadlinkjs-sm');
 
 module.exports = function(homebridge) {
