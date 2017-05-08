@@ -38,13 +38,13 @@ function broadlinkMP(log, config, api) {
         return mb;
     }
     this.services = [];
-    
+    var Snumber;
     for (var i = 1; i < 5; i++) {
         var OutletService = new Service.Outlet("S"+i);
-
+        Snumber = "S"+i;
         OutletService.getCharacteristic(Characteristic.On)
-          .on('get', this.getState("S"+i).bind(this))
-          .on('set', this.setState("S"+i).bind(this));
+          .on('get', this.getState(Snumber).bind(this))
+          .on('set', this.setState(Snumber).bind(this));
         
         var accessoryInformationService = new Service.AccessoryInformation()
             .setCharacteristic(Characteristic.Manufacturer, 'Broadlink')
