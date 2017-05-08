@@ -167,7 +167,7 @@ broadlinkMP.prototype.setState = function(state, callback) {
             });
         }
     } else {
-        if (this.powered) {
+        if (socketPowered) {
             b.on("deviceReady", (dev) => {
                 if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
                     self.log(self.Snumber + "is OFF!");
