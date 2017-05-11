@@ -1,0 +1,34 @@
+{
+    "name": "homebridge-broadlink-mp",
+    "version": "0.0.1",
+    "description": "Homebridge plugin for Broadlink MP1",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \\\"Error: no test specified\\\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/smka/homebridge-broadlink-mp.git"
+    },
+    "keywords": [
+        "homebridge-plugin",
+        "broadlink",
+        "mp",
+        "mp1",
+        "plugin",
+        "homebridge"
+    ],
+    "engines": {
+        "node": ">=0.12.0",
+        "homebridge": ">=0.2.0"
+    },
+    "author": "smka",
+    "license": "MIT",
+    "dependencies": {
+        "broadlinkjs-sm": ">=0.1.3"
+    },
+    "bugs": {
+        "url": "https://github.com/smka/homebridge-broadlink-mp/issues"
+    },
+    "homepage": "https://github.com/smka/homebridge-broadlink-mp#readme"
+}
