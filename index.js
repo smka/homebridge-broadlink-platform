@@ -114,7 +114,6 @@ BroadlinkAccessory.prototype = {
 
     getSPState: function(callback) {
         var self = this;
-        //self.log("getServices");
         var b = new broadlink();
         b.discover();
 
