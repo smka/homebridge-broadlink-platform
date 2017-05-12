@@ -187,6 +187,7 @@ BroadlinkAccessory.prototype = {
         b.on("deviceReady", (dev) => {
             if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
                 self.log("check power for " + self.name + ' ' + self.sname);
+                self.log("device type:" + dev.type + " @ " + dev.host.address);
                 dev.check_power();
                 dev.on("mp_power", (status_array) => {
                     if (!status_array[s_index - 1]) {
