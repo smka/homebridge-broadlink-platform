@@ -186,10 +186,12 @@ BroadlinkAccessory.prototype = {
 
         b.on("deviceReady", (dev) => {
             if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                self.log("check power for " + self.name + ' ' + self.sname);
-                self.log("device type:" + dev.type + " @ " + dev.host.address);
+                //self.log("check power for " + self.name);
+                //self.log("device type:" + dev.type + " @ " + dev.host.address);
                 dev.check_power();
                 dev.on("mp_power", (status_array) => {
+                    self.log(self.name + " power is on - " + status_array[s_index - 1]);
+                    dev.exit();
                     if (!status_array[s_index - 1]) {
                         self.powered = false;
                         return callback(null, false);
@@ -213,11 +215,11 @@ BroadlinkAccessory.prototype = {
         self.log("set " + self.sname + " state to " + state);
         if (state) {
             if (self.powered) {
-                return callback(null, true)
+                return callback(null, true);
             } else {
                 b.on("deviceReady", (dev) => {
                     if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                        self.log("ON!");
+                        self.log(self.sname + " ON!");
                         dev.set_power(s_index, true);
                         dev.exit();
                         self.powered = true;
@@ -231,7 +233,7 @@ BroadlinkAccessory.prototype = {
             if (self.powered) {
                 b.on("deviceReady", (dev) => {
                     if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                        self.log("OFF!");
+                        self.log(self.sname + " OFF!");
                         dev.set_power(s_index, false);
                         dev.exit();
                         self.powered = false;
