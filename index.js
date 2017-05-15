@@ -191,7 +191,7 @@ BroadlinkAccessory.prototype = {
         var s_index = self.sname[1];
         var timer = 0;
         for (i=0; i<s_index; i++){
-            timer+=100;
+            timer+=150;
         }
         setTimeout(function(){
             var refresh = setInterval(function(){
@@ -201,12 +201,15 @@ BroadlinkAccessory.prototype = {
                     self.storage.setItem("MP1_discovering", true)
                     b.discover();
                     b.on("deviceReady", (dev) => {
+                        self.log("detected device type:" + dev.type + " @ " + dev.host.address);
                         if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                            //self.log("check power for " + self.name);
+                            self.log("deviceReaddy for " + self.name);
                             dev.check_power();
                             dev.on("mp_power", (status_array) => {
+                                self.log("Status is ready for " + self.name);
                                 self.log(self.name + " power is on - " + status_array[s_index - 1]);
                                 dev.exit();
+                                self.log("MP1 Exited for " + self.name);
                                 self.storage.setItem("MP1_discovering", false);
                                 clearInterval(refresh);
                                 if (!status_array[s_index - 1]) {
@@ -220,6 +223,7 @@ BroadlinkAccessory.prototype = {
 
                         } else {
                             dev.exit();
+                            self.log("exited device type:" + dev.type + " @ " + dev.host.address);
                         }
                     });  
                 }
