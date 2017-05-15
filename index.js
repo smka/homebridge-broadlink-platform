@@ -58,8 +58,7 @@ function BroadlinkAccessory(log, config) {
     this.storage.initSync({
         dir: HomebridgeAPI.user.persistPath()
       });
-    this.storage.setItem("MP1", [0, [false, false, false, false]]);
-
+    this.storage.setItem("MP1_discovering", false);
     if (!this.ip && !this.mac) throw new Error("You must provide a config value for 'ip' or 'mac'.");
 
     // MAC string to MAC buffer
@@ -192,59 +191,42 @@ BroadlinkAccessory.prototype = {
         var s_index = self.sname[1];
         var timer = 0;
         for (i=0; i<s_index; i++){
-            timer+=600;
+            timer+=100;
         }
-
         setTimeout(function(){
-            var storageData = self.storage.getItem("MP1");
-            var socketsStatus = storageData[1];
-            var lastCheck = storageData[0];
-            var threshold = Date.now() - lastCheck;
-            if (threshold > 5000) {
-                self.log("checking status for " +self.name);
-                var discoverStart = Date.now();
-                b.discover();
-                b.on("deviceReady", (dev) => {
-                    if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                        var discoverEnd = Date.now();
-                        var discoverThreshold = discoverEnd - discoverStart;
-                        self.log("Time for Discover: " + discoverThreshold);
-                        //self.log("check power for " + self.name);
-                        //self.log("device type:" + dev.type + " @ " + dev.host.address);
-                        dev.check_power();
-                        dev.on("mp_power", (status_array) => {
-                            var powerCheckEnd = Date.now();
-                            var powerCheckThreshold = powerCheckEnd - discoverEnd;
-                            self.log("Time for Power Check: " + powerCheckThreshold);
-                            self.log(self.name + " power is on - " + status_array[s_index - 1]);
-                            dev.exit();
-                            self.storage.setItem("MP1", [Date.now(), status_array])
-                            if (!status_array[s_index - 1]) {
-                                self.powered = false;
-                                return callback(null, false);
-                            } else {
-                                self.powered = true;
-                                return callback(null, true);
-                            }
-                        });
+            var refresh = setInterval(function(){
+                var isDiscovering = self.storage.getItem("MP1_discovering");
+                if (!isDiscovering) {
+                    self.log("checking status for " +self.name);
+                    self.storage.setItem("MP1_discovering", true)
+                    b.discover();
+                    b.on("deviceReady", (dev) => {
+                        if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+                            self.log("check power for " + self.name);
+                            dev.check_power();
+                            dev.on("mp_power", (status_array) => {
+                                self.log(self.name + " power is on - " + status_array[s_index - 1]);
+                                dev.exit();
+                                self.storage.setItem("MP1_discovering", false);
+                                clearInterval(refresh);
+                                if (!status_array[s_index - 1]) {
+                                    self.powered = false;
+                                    return callback(null, false);
+                                } else {
+                                    self.powered = true;
+                                    return callback(null, true);
+                                }
+                            });
 
-                    } else {
-                        dev.exit();
-                    }
-                });  
-            } else {
-                self.log("NOT checking status for " +self.name+" - using Persist");
-                if (!socketsStatus[s_index - 1]) {
-                    self.powered = false;
-                    self.log(self.name + " power is on - " + socketsStatus[s_index - 1]);
-                    return callback(null, false);
-                } else {
-                    self.powered = true;
-                    self.log(self.name + " power is on - " + socketsStatus[s_index - 1]);
-                    return callback(null, true);
+                        } else {
+                            dev.exit();
+                        }
+                    });  
                 }
-            }
-        }, timer);
+            }, 100)
+        }, timer)
+        
+            
     },
 
     setMPstate: function(state, callback) {
@@ -257,33 +239,48 @@ BroadlinkAccessory.prototype = {
             if (self.powered) {
                 return callback(null, true);
             } else {
-                b.discover();
-                b.on("deviceReady", (dev) => {
-                    if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                        self.log(self.sname + " ON!");
-                        dev.set_power(s_index, true);
-                        dev.exit();
-                        self.powered = true;
-                        return callback(null, true);
-                    } else {
-                        dev.exit();
+                var refreshSet = setInterval(function(){
+                    var isDiscovering = self.storage.getItem("MP1_discovering");
+                    if (!isDiscovering) {
+                        self.storage.setItem("MP1_discovering", true)
+                        b.discover();
+                        b.on("deviceReady", (dev) => {
+                            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+                                self.log(self.sname + " ON!");
+                                dev.set_power(s_index, true);
+                                dev.exit();
+                                self.storage.setItem("MP1_discovering", false);
+                                clearInterval(refreshSet);
+                                self.powered = true;
+                                return callback(null, true);
+                            } else {
+                                dev.exit();
+                            }
+                        });
                     }
-                });
+                }, 100)
+                
             }
         } else {
             if (self.powered) {
-                b.discover();
-                b.on("deviceReady", (dev) => {
-                    if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                        self.log(self.sname + " OFF!");
-                        dev.set_power(s_index, false);
-                        dev.exit();
-                        self.powered = false;
-                        return callback(null, false);
-                    } else {
-                        dev.exit();
+                var refreshSet = setInterval(function(){
+                    var isDiscovering = self.storage.getItem("MP1_discovering");
+                    if (!isDiscovering) {
+                        self.storage.setItem("MP1_discovering", true)
+                        b.discover();
+                        b.on("deviceReady", (dev) => {
+                            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+                                self.log(self.sname + " OFF!");
+                                dev.set_power(s_index, false);
+                                dev.exit();
+                                self.powered = false;
+                                return callback(null, false);
+                            } else {
+                                dev.exit();
+                            }
+                        });
                     }
-                });
+                }, 100)
             } else {
                 return callback(null, false)
             }
