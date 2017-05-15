@@ -192,7 +192,7 @@ BroadlinkAccessory.prototype = {
         var s_index = self.sname[1];
         var timer = 0;
         for (i=0; i<s_index; i++){
-            timer+=300;
+            timer+=800;
         }
 
         setTimeout(function(){
@@ -200,7 +200,8 @@ BroadlinkAccessory.prototype = {
             var socketsStatus = storageData[1];
             var lastCheck = storageData[0];
             var threshold = Date.now() - lastCheck;
-            if (threshold > 5000) {
+            if (threshold > 20000) {
+                self.log("checking status for " +self.name);
                 b.discover();
                 b.on("deviceReady", (dev) => {
                     if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
@@ -225,6 +226,7 @@ BroadlinkAccessory.prototype = {
                     }
                 });  
             } else {
+                self.log("NOT checking status for " +self.name+" - using Persist");
                 if (!socketsStatus[s_index - 1]) {
                     self.powered = false;
                     return callback(null, false);
@@ -240,12 +242,13 @@ BroadlinkAccessory.prototype = {
         var self = this
         var s_index = self.sname[1];
         var b = new broadlink();
-        b.discover();
+        
         self.log("set " + self.sname + " state to " + state);
         if (state) {
             if (self.powered) {
                 return callback(null, true);
             } else {
+                b.discover();
                 b.on("deviceReady", (dev) => {
                     if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
                         self.log(self.sname + " ON!");
@@ -260,6 +263,7 @@ BroadlinkAccessory.prototype = {
             }
         } else {
             if (self.powered) {
+                b.discover();
                 b.on("deviceReady", (dev) => {
                     if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
                         self.log(self.sname + " OFF!");
