@@ -123,6 +123,7 @@ BroadlinkAccessory.prototype = {
                 dev.on("power", (pwr) => {
                     self.log(self.name + self.sname + " power is on - " + pwr);
                     dev.exit();
+                    clearInterval(checkAgainSP)
                     if (!pwr) {
                         self.powered = false;
                         return callback(null, false);
@@ -135,6 +136,10 @@ BroadlinkAccessory.prototype = {
                 dev.exit();
             }
         });
+        var checkAgainSP = setInterval(function(){
+            self.log("Discovering Again for SP Status... " + self.sname);
+            b.discover();
+        }, 1000)
     },
 
     setSPState: function(state, callback) {
@@ -152,12 +157,17 @@ BroadlinkAccessory.prototype = {
                         self.log("ON!");
                         dev.set_power(true);
                         dev.exit();
+                        clearInterval(checkAgainSPset)
                         self.powered = true;
                         return callback(null, true);
                     } else {
                         dev.exit();
                     }
                 });
+                var checkAgainSPset = setInterval(function(){
+                    self.log("Discovering Again for SP Set... " + self.sname);
+                    b.discover();
+                }, 1000)
             }
         } else {
             if (self.powered) {
@@ -166,12 +176,17 @@ BroadlinkAccessory.prototype = {
                         self.log("OFF!");
                         dev.set_power(false);
                         dev.exit();
+                        clearInterval(checkAgainSPset)
                         self.powered = false;
                         return callback(null, false);
                     } else {
                         dev.exit();
                     }
                 });
+                var checkAgainSPset = setInterval(function(){
+                    self.log("Discovering Again for SP Set... " + self.sname);
+                    b.discover();
+                }, 1000)
             } else {
                 return callback(null, false)
             }
@@ -212,7 +227,7 @@ BroadlinkAccessory.prototype = {
         var checkAgain = setInterval(function(){
             self.log("Discovering Again for Status... " + self.sname);
             b.discover();
-        }, 2000)
+        }, 1000)
         
             
     },
@@ -243,7 +258,7 @@ BroadlinkAccessory.prototype = {
                 var checkAgainSet = setInterval(function(){
                     self.log("Discovering Again for Set Command... " + self.sname);
                     b.discover();
-                }, 2000)
+                }, 1000)
             }
         } else {
             if (self.powered) {
@@ -263,7 +278,7 @@ BroadlinkAccessory.prototype = {
                 var checkAgainSet = setInterval(function(){
                     self.log("Discovering Again for Set Command... " + self.sname);
                     b.discover();
-                }, 2000)
+                }, 1000)
             } else {
                 return callback(null, false)
             }
