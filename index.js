@@ -50,7 +50,6 @@ function BroadlinkAccessory(log, config) {
     this.ip = config.ip;
     this.mac = config.mac;
     this.powered = false;
-    
 
     if (!this.ip && !this.mac) throw new Error("You must provide a config value for 'ip' or 'mac'.");
 
@@ -139,6 +138,7 @@ BroadlinkAccessory.prototype = {
         var checkAgainSP = setInterval(function(){
             b.discover();
         }, 1000)
+
     },
 
     setSPState: function(state, callback) {
