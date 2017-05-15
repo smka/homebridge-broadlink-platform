@@ -192,7 +192,7 @@ BroadlinkAccessory.prototype = {
         var s_index = self.sname[1];
         var timer = 0;
         for (i=0; i<s_index; i++){
-            timer+=800;
+            timer+=500;
         }
 
         setTimeout(function(){
@@ -200,15 +200,22 @@ BroadlinkAccessory.prototype = {
             var socketsStatus = storageData[1];
             var lastCheck = storageData[0];
             var threshold = Date.now() - lastCheck;
-            if (threshold > 20000) {
+            if (threshold > 5000) {
                 self.log("checking status for " +self.name);
+                var discoverStart = Date.now();
                 b.discover();
                 b.on("deviceReady", (dev) => {
                     if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+                        var discoverEnd = Date.now;
+                        var discoverThreshold = discoverEnd - discoverStart;
+                        self.log("Time for Discover: " + discoverThreshold);
                         //self.log("check power for " + self.name);
                         //self.log("device type:" + dev.type + " @ " + dev.host.address);
                         dev.check_power();
                         dev.on("mp_power", (status_array) => {
+                            var powerCheckEnd = Date.now;
+                            var powerCheckThreshold = powerCheckEnd - discoverEnd;
+                            self.log("Time for Power Check: " + powerCheckThreshold);
                             self.log(self.name + " power is on - " + status_array[s_index - 1]);
                             dev.exit();
                             self.storage.setItem("MP1", [Date.now(), status_array])
