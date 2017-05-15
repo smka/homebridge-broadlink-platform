@@ -1,4 +1,4 @@
-
+    {
     "name": "homebridge-broadlink-mp",
     "version": "0.0.1",
     "description": "Homebridge plugin for Broadlink MP1",
