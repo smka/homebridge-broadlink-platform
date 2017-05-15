@@ -212,6 +212,7 @@ BroadlinkAccessory.prototype = {
                                 self.log("MP1 Exited for " + self.name);
                                 self.storage.setItem("MP1_discovering", false);
                                 clearInterval(refresh);
+                                clearInterval(checkAgain);
                                 if (!status_array[s_index - 1]) {
                                     self.powered = false;
                                     return callback(null, false);
@@ -226,8 +227,8 @@ BroadlinkAccessory.prototype = {
                             self.log("exited device type:" + dev.type + " @ " + dev.host.address);
                         }
                     });
-                    setInterval(function(){
-                        self.log("Discovering Again for Status...");
+                    var checkAgain = setInterval(function(){
+                        self.log("Discovering Again for Status... " + self.sname);
                         b.discover();
                     }, 1500)
                 }
@@ -259,15 +260,15 @@ BroadlinkAccessory.prototype = {
                                 dev.exit();
                                 self.storage.setItem("MP1_discovering", false);
                                 clearInterval(refreshSet);
-                                clearInterval(checkAgain);
+                                clearInterval(checkAgainSet);
                                 self.powered = true;
                                 return callback(null, true);
                             } else {
                                 dev.exit();
                             }
                         });
-                        var checkAgain = setInterval(function(){
-                            self.log("Discovering Again for Set Command...");
+                        var checkAgainSet = setInterval(function(){
+                            self.log("Discovering Again for Set Command... " + self.sname);
                             b.discover();
                         }, 2000)
                     }
@@ -296,7 +297,7 @@ BroadlinkAccessory.prototype = {
                             }
                         });
                         var checkAgainSet = setInterval(function(){
-                            self.log("Discovering Again for Set Command...");
+                            self.log("Discovering Again for Set Command... " + self.sname);
                             b.discover();
                         }, 1500)
                     }
