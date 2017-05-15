@@ -226,7 +226,7 @@ BroadlinkAccessory.prototype = {
                             self.log("exited device type:" + dev.type + " @ " + dev.host.address);
                         }
                     });
-                    setintrval(function(){
+                    setInterval(function(){
                         self.log("Discovering Again for Status...");
                         b.discover();
                     }, 1500)
@@ -265,7 +265,7 @@ BroadlinkAccessory.prototype = {
                                 dev.exit();
                             }
                         });
-                        setintrval(function(){
+                        setInterval(function(){
                             self.log("Discovering Again for Set Command...");
                             b.discover();
                         }, 1500)
@@ -293,7 +293,7 @@ BroadlinkAccessory.prototype = {
                                 dev.exit();
                             }
                         });
-                        setintrval(function(){
+                        setInterval(function(){
                             self.log("Discovering Again for Set Command...");
                             b.discover();
                         }, 1500)
