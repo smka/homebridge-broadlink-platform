@@ -259,16 +259,17 @@ BroadlinkAccessory.prototype = {
                                 dev.exit();
                                 self.storage.setItem("MP1_discovering", false);
                                 clearInterval(refreshSet);
+                                clearInterval(checkAgain);
                                 self.powered = true;
                                 return callback(null, true);
                             } else {
                                 dev.exit();
                             }
                         });
-                        setInterval(function(){
+                        var checkAgain = setInterval(function(){
                             self.log("Discovering Again for Set Command...");
                             b.discover();
-                        }, 1500)
+                        }, 2000)
                     }
                 }, 100)
                 
@@ -287,13 +288,14 @@ BroadlinkAccessory.prototype = {
                                 dev.exit();
                                 self.storage.setItem("MP1_discovering", false);
                                 clearInterval(refreshSet);
+                                clearInterval(checkAgainSet);
                                 self.powered = false;
                                 return callback(null, false);
                             } else {
                                 dev.exit();
                             }
                         });
-                        setInterval(function(){
+                        var checkAgainSet = setInterval(function(){
                             self.log("Discovering Again for Set Command...");
                             b.discover();
                         }, 1500)
