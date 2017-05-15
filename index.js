@@ -203,7 +203,7 @@ BroadlinkAccessory.prototype = {
                     b.on("deviceReady", (dev) => {
                         self.log("detected device type:" + dev.type + " @ " + dev.host.address);
                         if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                            self.log("deviceReaddy for " + self.name);
+                            self.log("deviceReady for " + self.name);
                             dev.check_power();
                             dev.on("mp_power", (status_array) => {
                                 self.log("Status is ready for " + self.name);
@@ -225,7 +225,11 @@ BroadlinkAccessory.prototype = {
                             dev.exit();
                             self.log("exited device type:" + dev.type + " @ " + dev.host.address);
                         }
-                    });  
+                    });
+                    setintrval(function(){
+                        self.log("Discovering Again for Status...");
+                        b.discover();
+                    }, 1500)
                 }
             }, 100)
         }, timer)
@@ -261,6 +265,10 @@ BroadlinkAccessory.prototype = {
                                 dev.exit();
                             }
                         });
+                        setintrval(function(){
+                            self.log("Discovering Again for Set Command...");
+                            b.discover();
+                        }, 1500)
                     }
                 }, 100)
                 
@@ -285,6 +293,10 @@ BroadlinkAccessory.prototype = {
                                 dev.exit();
                             }
                         });
+                        setintrval(function(){
+                            self.log("Discovering Again for Set Command...");
+                            b.discover();
+                        }, 1500)
                     }
                 }, 100)
             } else {
