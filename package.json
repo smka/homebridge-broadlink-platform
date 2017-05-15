@@ -23,6 +23,8 @@
   "license": "MIT",
   "dependencies": {
     "broadlinkjs-sm": "git+https://github.com/smka/broadlinkjs-sm.git#dev"
+    "object-assign": "^4.0.1",
+    "node-persist": "0.0.8"
   },
   "repository": {
     "type": "git",
