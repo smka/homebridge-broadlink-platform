@@ -242,7 +242,7 @@ BroadlinkAccessory.prototype = {
                 b.discover();
                 b.on("deviceReady", (dev) => {
                     if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                        self.log(self.sname + "is ON!");
+                        self.log(self.sname + " is ON!");
                         dev.set_power(s_index, true);
                         dev.exit();
                         clearInterval(checkAgainSet);
@@ -262,7 +262,7 @@ BroadlinkAccessory.prototype = {
                 b.discover();
                 b.on("deviceReady", (dev) => {
                     if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                        self.log(self.sname + "is OFF!");
+                        self.log(self.sname + " is OFF!");
                         dev.set_power(s_index, false);
                         dev.exit();
                         clearInterval(checkAgainSet);
