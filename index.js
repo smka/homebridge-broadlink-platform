@@ -4,7 +4,6 @@ var broadlink = require('broadlinkjs-sm');
 module.exports = function(homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
-
     homebridge.registerPlatform("homebridge-broadlink-mp", "broadlinkMP", broadlinkMP);
 }
 
@@ -123,6 +122,7 @@ BroadlinkAccessory.prototype = {
                 dev.on("power", (pwr) => {
                     self.log(self.name + self.sname + " power is on - " + pwr);
                     dev.exit();
+                    clearInterval(checkAgainSP)
                     if (!pwr) {
                         self.powered = false;
                         return callback(null, false);
@@ -135,6 +135,10 @@ BroadlinkAccessory.prototype = {
                 dev.exit();
             }
         });
+        var checkAgainSP = setInterval(function(){
+            b.discover();
+        }, 1000)
+
     },
 
     setSPState: function(state, callback) {
@@ -152,12 +156,16 @@ BroadlinkAccessory.prototype = {
                         self.log("ON!");
                         dev.set_power(true);
                         dev.exit();
+                        clearInterval(checkAgainSPset)
                         self.powered = true;
                         return callback(null, true);
                     } else {
                         dev.exit();
                     }
                 });
+                var checkAgainSPset = setInterval(function(){
+                    b.discover();
+                }, 1000)
             }
         } else {
             if (self.powered) {
@@ -166,12 +174,16 @@ BroadlinkAccessory.prototype = {
                         self.log("OFF!");
                         dev.set_power(false);
                         dev.exit();
+                        clearInterval(checkAgainSPset)
                         self.powered = false;
                         return callback(null, false);
                     } else {
                         dev.exit();
                     }
                 });
+                var checkAgainSPset = setInterval(function(){
+                    b.discover();
+                }, 1000)
             } else {
                 return callback(null, false)
             }
@@ -182,16 +194,19 @@ BroadlinkAccessory.prototype = {
         var self = this;
         var b = new broadlink();
         var s_index = self.sname[1];
+        self.log("checking status for " +self.name);
         b.discover();
-
         b.on("deviceReady", (dev) => {
+            //self.log("detected device type:" + dev.type + " @ " + dev.host.address);
             if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                //self.log("check power for " + self.name);
-                //self.log("device type:" + dev.type + " @ " + dev.host.address);
+                //self.log("deviceReady for " + self.name);
                 dev.check_power();
                 dev.on("mp_power", (status_array) => {
+                    //self.log("Status is ready for " + self.name);
                     self.log(self.name + " power is on - " + status_array[s_index - 1]);
                     dev.exit();
+                    //self.log("MP1 Exited for " + self.sname);
+                    clearInterval(checkAgain);
                     if (!status_array[s_index - 1]) {
                         self.powered = false;
                         return callback(null, false);
@@ -203,49 +218,67 @@ BroadlinkAccessory.prototype = {
 
             } else {
                 dev.exit();
+                //self.log("exited device type:" + dev.type + " @ " + dev.host.address);
             }
         });
+        var checkAgain = setInterval(function(){
+            //self.log("Discovering Again for Status... " + self.sname);
+            b.discover();
+        }, 1000)
+        
+            
     },
 
     setMPstate: function(state, callback) {
         var self = this
         var s_index = self.sname[1];
         var b = new broadlink();
-        b.discover();
+        
         self.log("set " + self.sname + " state to " + state);
         if (state) {
             if (self.powered) {
                 return callback(null, true);
             } else {
+                b.discover();
                 b.on("deviceReady", (dev) => {
                     if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                        self.log(self.sname + " ON!");
+                        self.log(self.sname + " is ON!");
                         dev.set_power(s_index, true);
                         dev.exit();
+                        clearInterval(checkAgainSet);
                         self.powered = true;
                         return callback(null, true);
                     } else {
                         dev.exit();
                     }
                 });
+                var checkAgainSet = setInterval(function(){
+                    //self.log("Discovering Again for Set Command... " + self.sname);
+                    b.discover();
+                }, 1000)
             }
         } else {
             if (self.powered) {
+                b.discover();
                 b.on("deviceReady", (dev) => {
                     if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                        self.log(self.sname + " OFF!");
+                        self.log(self.sname + " is OFF!");
                         dev.set_power(s_index, false);
                         dev.exit();
+                        clearInterval(checkAgainSet);
                         self.powered = false;
                         return callback(null, false);
                     } else {
                         dev.exit();
                     }
                 });
+                var checkAgainSet = setInterval(function(){
+                    //self.log("Discovering Again for Set Command... " + self.sname);
+                    b.discover();
+                }, 1000)
             } else {
                 return callback(null, false)
             }
         }
     }
-
 }
