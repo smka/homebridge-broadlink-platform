@@ -1,11 +1,9 @@
 var Accessory, Service, Characteristic, UUIDGen;
 var broadlink = require('broadlinkjs-sm');
-var assign = require('object-assign');
 
 module.exports = function(homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
-    HomebridgeAPI = homebridge;
     homebridge.registerPlatform("homebridge-broadlink-mp", "broadlinkMP", broadlinkMP);
 }
 
@@ -44,7 +42,6 @@ broadlinkMP.prototype = {
 }
 
 function BroadlinkAccessory(log, config) {
-    this.storage = require('node-persist');
     this.log = log;
     this.config = config;
     this.sname = config.sname || "";
@@ -55,10 +52,6 @@ function BroadlinkAccessory(log, config) {
     this.powered = false;
     
 
-    this.storage.initSync({
-        dir: HomebridgeAPI.user.persistPath()
-      });
-    this.storage.setItem("MP1_discovering", false);
     if (!this.ip && !this.mac) throw new Error("You must provide a config value for 'ip' or 'mac'.");
 
     // MAC string to MAC buffer
@@ -189,51 +182,37 @@ BroadlinkAccessory.prototype = {
         var self = this;
         var b = new broadlink();
         var s_index = self.sname[1];
-        var timer = 0;
-        for (i=0; i<s_index; i++){
-            timer+=150;
-        }
-        setTimeout(function(){
-            var refresh = setInterval(function(){
-                var isDiscovering = self.storage.getItem("MP1_discovering");
-                if (!isDiscovering) {
-                    self.log("checking status for " +self.name);
-                    self.storage.setItem("MP1_discovering", true)
-                    b.discover();
-                    b.on("deviceReady", (dev) => {
-                        self.log("detected device type:" + dev.type + " @ " + dev.host.address);
-                        if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                            self.log("deviceReady for " + self.name);
-                            dev.check_power();
-                            dev.on("mp_power", (status_array) => {
-                                self.log("Status is ready for " + self.name);
-                                self.log(self.name + " power is on - " + status_array[s_index - 1]);
-                                dev.exit();
-                                self.log("MP1 Exited for " + self.name);
-                                self.storage.setItem("MP1_discovering", false);
-                                clearInterval(refresh);
-                                clearInterval(checkAgain);
-                                if (!status_array[s_index - 1]) {
-                                    self.powered = false;
-                                    return callback(null, false);
-                                } else {
-                                    self.powered = true;
-                                    return callback(null, true);
-                                }
-                            });
+        self.log("checking status for " +self.name);
+        b.discover();
+        b.on("deviceReady", (dev) => {
+            self.log("detected device type:" + dev.type + " @ " + dev.host.address);
+            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+                self.log("deviceReady for " + self.name);
+                dev.check_power();
+                dev.on("mp_power", (status_array) => {
+                    self.log("Status is ready for " + self.name);
+                    self.log(self.name + " power is on - " + status_array[s_index - 1]);
+                    dev.exit();
+                    self.log("MP1 Exited for " + self.sname);
+                    clearInterval(checkAgain);
+                    if (!status_array[s_index - 1]) {
+                        self.powered = false;
+                        return callback(null, false);
+                    } else {
+                        self.powered = true;
+                        return callback(null, true);
+                    }
+                });
 
-                        } else {
-                            dev.exit();
-                            self.log("exited device type:" + dev.type + " @ " + dev.host.address);
-                        }
-                    });
-                    var checkAgain = setInterval(function(){
-                        self.log("Discovering Again for Status... " + self.sname);
-                        b.discover();
-                    }, 1500)
-                }
-            }, 100)
-        }, timer)
+            } else {
+                dev.exit();
+                self.log("exited device type:" + dev.type + " @ " + dev.host.address);
+            }
+        });
+        var checkAgain = setInterval(function(){
+            self.log("Discovering Again for Status... " + self.sname);
+            b.discover();
+        }, 2000)
         
             
     },
@@ -248,60 +227,43 @@ BroadlinkAccessory.prototype = {
             if (self.powered) {
                 return callback(null, true);
             } else {
-                var refreshSet = setInterval(function(){
-                    var isDiscovering = self.storage.getItem("MP1_discovering");
-                    if (!isDiscovering) {
-                        self.storage.setItem("MP1_discovering", true)
-                        b.discover();
-                        b.on("deviceReady", (dev) => {
-                            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                                self.log(self.sname + " ON!");
-                                dev.set_power(s_index, true);
-                                dev.exit();
-                                self.storage.setItem("MP1_discovering", false);
-                                clearInterval(refreshSet);
-                                clearInterval(checkAgainSet);
-                                self.powered = true;
-                                return callback(null, true);
-                            } else {
-                                dev.exit();
-                            }
-                        });
-                        var checkAgainSet = setInterval(function(){
-                            self.log("Discovering Again for Set Command... " + self.sname);
-                            b.discover();
-                        }, 2000)
+                b.discover();
+                b.on("deviceReady", (dev) => {
+                    if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+                        self.log(self.sname + " ON!");
+                        dev.set_power(s_index, true);
+                        dev.exit();
+                        clearInterval(checkAgainSet);
+                        self.powered = true;
+                        return callback(null, true);
+                    } else {
+                        dev.exit();
                     }
-                }, 100)
-                
+                });
+                var checkAgainSet = setInterval(function(){
+                    self.log("Discovering Again for Set Command... " + self.sname);
+                    b.discover();
+                }, 2000)
             }
         } else {
             if (self.powered) {
-                var refreshSet = setInterval(function(){
-                    var isDiscovering = self.storage.getItem("MP1_discovering");
-                    if (!isDiscovering) {
-                        self.storage.setItem("MP1_discovering", true)
-                        b.discover();
-                        b.on("deviceReady", (dev) => {
-                            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                                self.log(self.sname + " OFF!");
-                                dev.set_power(s_index, false);
-                                dev.exit();
-                                self.storage.setItem("MP1_discovering", false);
-                                clearInterval(refreshSet);
-                                clearInterval(checkAgainSet);
-                                self.powered = false;
-                                return callback(null, false);
-                            } else {
-                                dev.exit();
-                            }
-                        });
-                        var checkAgainSet = setInterval(function(){
-                            self.log("Discovering Again for Set Command... " + self.sname);
-                            b.discover();
-                        }, 1500)
+                b.discover();
+                b.on("deviceReady", (dev) => {
+                    if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+                        self.log(self.sname + " OFF!");
+                        dev.set_power(s_index, false);
+                        dev.exit();
+                        clearInterval(checkAgainSet);
+                        self.powered = false;
+                        return callback(null, false);
+                    } else {
+                        dev.exit();
                     }
-                }, 100)
+                });
+                var checkAgainSet = setInterval(function(){
+                    self.log("Discovering Again for Set Command... " + self.sname);
+                    b.discover();
+                }, 2000)
             } else {
                 return callback(null, false)
             }
