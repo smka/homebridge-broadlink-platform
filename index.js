@@ -230,7 +230,7 @@ BroadlinkAccessory.prototype = {
         var waitForReady = setInterval(function(){
             if (mpReadyState){
                 clearInterval(waitForReady);
-                if (!mp_power[s_index - 1]) {
+                if (!mpStatusArray[s_index - 1]) {
                     self.powered = false;
                     return callback(null, false);
                 } else {
