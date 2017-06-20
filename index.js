@@ -1,13 +1,13 @@
-var Accessory, Service, Characteristic, UUIDGen;
+var Accessory, Service, Characteristic;
 var broadlink = require('broadlinkjs-sm');
 
 module.exports = function(homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
-    homebridge.registerPlatform("homebridge-broadlink-mp", "broadlinkMP", broadlinkMP);
+    homebridge.registerPlatform("homebridge-broadlink-platform", "broadlinkPlatform", broadlinkPlatform);
 }
 
-function broadlinkMP(log, config, api) {
+function broadlinkPlatform(log, config, api) {
     this.log = log;
     this.config = config;
 
@@ -17,7 +17,7 @@ function broadlinkMP(log, config, api) {
 
 }
 
-broadlinkMP.prototype = {
+broadlinkPlatform.prototype = {
     accessories: function(callback) {
         //For each device in cfg, create an accessory!
         var foundAccessories = this.config.accessories;
@@ -135,7 +135,7 @@ BroadlinkAccessory.prototype = {
                 dev.exit();
             }
         });
-        var checkAgainSP = setInterval(function(){
+        var checkAgainSP = setInterval(function() {
             b.discover();
         }, 1000)
 
@@ -163,7 +163,7 @@ BroadlinkAccessory.prototype = {
                         dev.exit();
                     }
                 });
-                var checkAgainSPset = setInterval(function(){
+                var checkAgainSPset = setInterval(function() {
                     b.discover();
                 }, 1000)
             }
@@ -181,7 +181,7 @@ BroadlinkAccessory.prototype = {
                         dev.exit();
                     }
                 });
-                var checkAgainSPset = setInterval(function(){
+                var checkAgainSPset = setInterval(function() {
                     b.discover();
                 }, 1000)
             } else {
@@ -194,7 +194,7 @@ BroadlinkAccessory.prototype = {
         var self = this;
         var b = new broadlink();
         var s_index = self.sname[1];
-        self.log("checking status for " +self.name);
+        self.log("checking status for " + self.name);
         b.discover();
         b.on("deviceReady", (dev) => {
             //self.log("detected device type:" + dev.type + " @ " + dev.host.address);
@@ -221,19 +221,19 @@ BroadlinkAccessory.prototype = {
                 //self.log("exited device type:" + dev.type + " @ " + dev.host.address);
             }
         });
-        var checkAgain = setInterval(function(){
+        var checkAgain = setInterval(function() {
             //self.log("Discovering Again for Status... " + self.sname);
             b.discover();
         }, 1000)
-        
-            
+
+
     },
 
     setMPstate: function(state, callback) {
         var self = this
         var s_index = self.sname[1];
         var b = new broadlink();
-        
+
         self.log("set " + self.sname + " state to " + state);
         if (state) {
             if (self.powered) {
@@ -252,7 +252,7 @@ BroadlinkAccessory.prototype = {
                         dev.exit();
                     }
                 });
-                var checkAgainSet = setInterval(function(){
+                var checkAgainSet = setInterval(function() {
                     //self.log("Discovering Again for Set Command... " + self.sname);
                     b.discover();
                 }, 1000)
@@ -272,7 +272,7 @@ BroadlinkAccessory.prototype = {
                         dev.exit();
                     }
                 });
-                var checkAgainSet = setInterval(function(){
+                var checkAgainSet = setInterval(function() {
                     //self.log("Discovering Again for Set Command... " + self.sname);
                     b.discover();
                 }, 1000)
