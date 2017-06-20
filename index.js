@@ -212,7 +212,7 @@ BroadlinkAccessory.prototype = {
                         mpStatusArray = status_array;
                         mpReadyState = true;
                         for (i=0;i<4;i++){
-                            self.log("s" + (i+1) + " power is on - " + status_array[s_index - 1]);
+                            self.log("s" + (i+1) + " power is on - " + status_array[i]);
                         }
                         //self.log("MP1 Exited for " + self.sname);
                     });
