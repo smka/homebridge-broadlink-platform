@@ -10,6 +10,8 @@ module.exports = function(homebridge) {
 function broadlinkPlatform(log, config, api) {
     this.log = log;
     this.config = config;
+    this.mpStatusArray = [false, false, false, false];
+    this.mpReadyState = false;
 
     if (api) {
         this.api = api;
@@ -27,12 +29,12 @@ broadlinkPlatform.prototype = {
             if (foundAccessories[i].type == "MP") {
                 for (var a = 1; a <= 4; a++) {
                     foundAccessories[i].sname = "s" + a;
-                    var accessory = new BroadlinkAccessory(this.log, foundAccessories[i]);
+                    var accessory = new BroadlinkAccessory(this.log, foundAccessories[i], this.mpStatusArray, this.mpReadyState);
                     myAccessories.push(accessory);
                     this.log('Created ' + accessory.name + ' ' + accessory.sname + ' Accessory');
                 }
             } else {
-                var accessory = new BroadlinkAccessory(this.log, foundAccessories[i]);
+                var accessory = new BroadlinkAccessory(this.log, foundAccessories[i], this.mpStatusArray, this.mpReadyState);
                 myAccessories.push(accessory);
                 this.log('Created ' + accessory.name + ' Accessory');
             }
@@ -41,7 +43,7 @@ broadlinkPlatform.prototype = {
     }
 }
 
-function BroadlinkAccessory(log, config) {
+function BroadlinkAccessory(log, config, mpStatusArray, mpReadyState) {
     this.log = log;
     this.config = config;
     this.sname = config.sname || "";
@@ -137,7 +139,7 @@ BroadlinkAccessory.prototype = {
         });
         var checkAgainSP = setInterval(function() {
             b.discover();
-        }, 1000)
+        }, 2000)
 
     },
 
@@ -165,7 +167,7 @@ BroadlinkAccessory.prototype = {
                 });
                 var checkAgainSPset = setInterval(function() {
                     b.discover();
-                }, 1000)
+                }, 2000)
             }
         } else {
             if (self.powered) {
@@ -183,7 +185,7 @@ BroadlinkAccessory.prototype = {
                 });
                 var checkAgainSPset = setInterval(function() {
                     b.discover();
-                }, 1000)
+                }, 2000)
             } else {
                 return callback(null, false)
             }
@@ -191,40 +193,54 @@ BroadlinkAccessory.prototype = {
     },
 
     getMPstate: function(callback) {
+        mpReadyState = false;
         var self = this;
         var b = new broadlink();
         var s_index = self.sname[1];
         self.log("checking status for " + self.name);
-        b.discover();
-        b.on("deviceReady", (dev) => {
-            //self.log("detected device type:" + dev.type + " @ " + dev.host.address);
-            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                //self.log("deviceReady for " + self.name);
-                dev.check_power();
-                dev.on("mp_power", (status_array) => {
-                    //self.log("Status is ready for " + self.name);
-                    self.log(self.name + " power is on - " + status_array[s_index - 1]);
-                    dev.exit();
-                    //self.log("MP1 Exited for " + self.sname);
-                    clearInterval(checkAgain);
-                    if (!status_array[s_index - 1]) {
-                        self.powered = false;
-                        return callback(null, false);
-                    } else {
-                        self.powered = true;
-                        return callback(null, true);
-                    }
-                });
-
-            } else {
-                dev.exit();
-                //self.log("exited device type:" + dev.type + " @ " + dev.host.address);
-            }
-        });
-        var checkAgain = setInterval(function() {
-            //self.log("Discovering Again for Status... " + self.sname);
+        if (self.sname == "s1"){
             b.discover();
-        }, 1000)
+            b.on("deviceReady", (dev) => {
+                //self.log("detected device type:" + dev.type + " @ " + dev.host.address);
+                if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+                    //self.log("deviceReady for " + self.name);
+                    dev.check_power();
+                    dev.on("mp_power", (status_array) => {
+                        clearInterval(checkAgain);
+                        dev.exit();
+                        //self.log("Status is ready for " + self.name);
+                        mpStatusArray = status_array;
+                        mpReadyState = true;
+                        for (i=0;i<4;i++){
+                            self.log("s" + (i+1) + " power is on - " + status_array[s_index - 1]);
+                        }
+                        //self.log("MP1 Exited for " + self.sname);
+                    });
+
+                } else {
+                    dev.exit();
+                    //self.log("exited device type:" + dev.type + " @ " + dev.host.address);
+                }
+            });
+            var checkAgain = setInterval(function() {
+                //self.log("Discovering Again for Status... " + self.sname);
+                b.discover();
+            }, 2000)
+        }
+        var waitForReady = setInterval(function(){
+            if (mpReadyState){
+                clearInterval(waitForReady);
+                if (!mp_power[s_index - 1]) {
+                    self.powered = false;
+                    return callback(null, false);
+                } else {
+                    self.powered = true;
+                    return callback(null, true);
+                }
+            }
+        }, 500)
+        
+        
 
 
     },
@@ -255,7 +271,7 @@ BroadlinkAccessory.prototype = {
                 var checkAgainSet = setInterval(function() {
                     //self.log("Discovering Again for Set Command... " + self.sname);
                     b.discover();
-                }, 1000)
+                }, 2000)
             }
         } else {
             if (self.powered) {
@@ -275,7 +291,7 @@ BroadlinkAccessory.prototype = {
                 var checkAgainSet = setInterval(function() {
                     //self.log("Discovering Again for Set Command... " + self.sname);
                     b.discover();
-                }, 1000)
+                }, 2000)
             } else {
                 return callback(null, false)
             }
