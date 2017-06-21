@@ -115,7 +115,7 @@ BroadlinkAccessory.prototype = {
     // b: broadlink
     discover: function(b) {
         b.discover(this.local_ip_address);
-    }
+    },
 
     getSPState: function(callback) {
         var self = this;
