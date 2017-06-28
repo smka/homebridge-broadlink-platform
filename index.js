@@ -50,6 +50,7 @@ function BroadlinkAccessory(log, config) {
     this.ip = config.ip;
     this.mac = config.mac;
     this.powered = false;
+    this.local_ip_address = config.local_ip_address;
 
     if (!this.ip && !this.mac) throw new Error("You must provide a config value for 'ip' or 'mac'.");
 
@@ -111,10 +112,15 @@ BroadlinkAccessory.prototype = {
         return services;
     },
 
+    // b: broadlink
+    discover: function(b) {
+        b.discover(this.local_ip_address);
+    },
+
     getSPState: function(callback) {
         var self = this;
         var b = new broadlink();
-        b.discover();
+        self.discover(b);
 
         b.on("deviceReady", (dev) => {
             if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
@@ -136,7 +142,7 @@ BroadlinkAccessory.prototype = {
             }
         });
         var checkAgainSP = setInterval(function() {
-            b.discover();
+            self.discover(b);
         }, 1000)
 
     },
@@ -144,7 +150,7 @@ BroadlinkAccessory.prototype = {
     setSPState: function(state, callback) {
         var self = this;
         var b = new broadlink();
-        b.discover();
+        self.discover(b);
 
         self.log("set SP state: " + state);
         if (state) {
@@ -164,7 +170,7 @@ BroadlinkAccessory.prototype = {
                     }
                 });
                 var checkAgainSPset = setInterval(function() {
-                    b.discover();
+                    self.discover(b);
                 }, 1000)
             }
         } else {
@@ -182,7 +188,7 @@ BroadlinkAccessory.prototype = {
                     }
                 });
                 var checkAgainSPset = setInterval(function() {
-                    b.discover();
+                    self.discover(b);
                 }, 1000)
             } else {
                 return callback(null, false)
@@ -195,7 +201,7 @@ BroadlinkAccessory.prototype = {
         var b = new broadlink();
         var s_index = self.sname[1];
         self.log("checking status for " + self.name);
-        b.discover();
+        self.discover(b);
         b.on("deviceReady", (dev) => {
             //self.log("detected device type:" + dev.type + " @ " + dev.host.address);
             if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
@@ -223,14 +229,14 @@ BroadlinkAccessory.prototype = {
         });
         var checkAgain = setInterval(function() {
             //self.log("Discovering Again for Status... " + self.sname);
-            b.discover();
+            self.discover(b);
         }, 1000)
 
 
     },
 
     setMPstate: function(state, callback) {
-        var self = this
+        var self = this;
         var s_index = self.sname[1];
         var b = new broadlink();
 
@@ -239,7 +245,7 @@ BroadlinkAccessory.prototype = {
             if (self.powered) {
                 return callback(null, true);
             } else {
-                b.discover();
+                self.discover(b);
                 b.on("deviceReady", (dev) => {
                     if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
                         self.log(self.sname + " is ON!");
@@ -254,12 +260,12 @@ BroadlinkAccessory.prototype = {
                 });
                 var checkAgainSet = setInterval(function() {
                     //self.log("Discovering Again for Set Command... " + self.sname);
-                    b.discover();
+                    self.discover(b);
                 }, 1000)
             }
         } else {
             if (self.powered) {
-                b.discover();
+                self.discover(b);
                 b.on("deviceReady", (dev) => {
                     if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
                         self.log(self.sname + " is OFF!");
@@ -274,7 +280,7 @@ BroadlinkAccessory.prototype = {
                 });
                 var checkAgainSet = setInterval(function() {
                     //self.log("Discovering Again for Set Command... " + self.sname);
-                    b.discover();
+                    self.discover(b);
                 }, 1000)
             } else {
                 return callback(null, false)
