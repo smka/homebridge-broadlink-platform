@@ -20,6 +20,8 @@
                 "type": "MP",
                 "mac": "CA:32:4F:77:D2:21",
                 "local_ip_address": "192.168.0.1"
+                "updatetimer": true,
+                "interval": 5
             }
         ]
     }]
