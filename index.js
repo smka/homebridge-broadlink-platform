@@ -51,7 +51,16 @@ function BroadlinkAccessory(log, config) {
     this.mac = config.mac;
     this.powered = false;
     this.local_ip_address = config.local_ip_address;
-
+    this.updatetimere = config["updatetimer"];
+    this.interval = config["interval"];
+    if(this.interval == null){
+        this.interval = 3;
+    }
+    this.BLservice = false;
+    this.timer;
+    if(this.updatetimere === true){
+        this.updateTimer();
+    }
     if (!this.ip && !this.mac) throw new Error("You must provide a config value for 'ip' or 'mac'.");
 
     // MAC string to MAC buffer
@@ -82,7 +91,7 @@ BroadlinkAccessory.prototype = {
             .setCharacteristic(Characteristic.Manufacturer, 'Broadlink');
 
         if (type == 'SP') {
-            var switchService = new Service.Switch(this.name);
+            var switchService = this.BLservice = new Service.Switch(this.name);
             switchService
                 .getCharacteristic(Characteristic.On)
                 .on('get', this.getSPState.bind(this))
@@ -95,7 +104,7 @@ BroadlinkAccessory.prototype = {
             services.push(switchService, informationService);
 
         } else if (type == 'MP') {
-            var switchService = new Service.Switch(this.sname);
+            var switchService = this.BLservice = new Service.Switch(this.sname);
             switchService
                 .getCharacteristic(Characteristic.On)
                 .on('get', this.getMPstate.bind(this))
@@ -126,7 +135,7 @@ BroadlinkAccessory.prototype = {
             if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
                 dev.check_power();
                 dev.on("power", (pwr) => {
-                    self.log(self.name + self.sname + " power is on - " + pwr);
+                    //self.log(self.name + self.sname + " power is on - " + pwr);
                     dev.exit();
                     clearInterval(checkAgainSP)
                     if (!pwr) {
@@ -152,7 +161,7 @@ BroadlinkAccessory.prototype = {
         var b = new broadlink();
         self.discover(b);
 
-        self.log("set SP state: " + state);
+        // self.log("set SP state: " + state);
         if (state) {
             if (self.powered) {
                 return callback(null, true)
@@ -200,7 +209,7 @@ BroadlinkAccessory.prototype = {
         var self = this;
         var b = new broadlink();
         var s_index = self.sname[1];
-        self.log("checking status for " + self.name);
+        // self.log("checking status for " + self.name);
         self.discover(b);
         b.on("deviceReady", (dev) => {
             //self.log("detected device type:" + dev.type + " @ " + dev.host.address);
@@ -209,7 +218,7 @@ BroadlinkAccessory.prototype = {
                 dev.check_power();
                 dev.on("mp_power", (status_array) => {
                     //self.log("Status is ready for " + self.name);
-                    self.log(self.name + " power is on - " + status_array[s_index - 1]);
+                    //self.log(self.name + " power is on - " + status_array[s_index - 1]);
                     dev.exit();
                     //self.log("MP1 Exited for " + self.sname);
                     clearInterval(checkAgain);
@@ -286,5 +295,69 @@ BroadlinkAccessory.prototype = {
                 return callback(null, false)
             }
         }
+    }
+}
+
+BroadlinkAccessory.prototype.updateTimer = function() {
+    if (this.updatetimere) {
+        clearTimeout(this.timer);
+        this.timer = setTimeout(function() {
+            if(this.BLservice !== false){
+                this.runTimer();
+            }
+            this.updateTimer();
+        }.bind(this), this.interval * 1000);
+    }
+}
+
+BroadlinkAccessory.prototype.runTimer = function() {
+    var self = this;
+    var type = this.config.type;
+    if (type == 'SP') {
+        var b = new broadlink();
+        self.discover(b);
+
+        b.on("deviceReady", (dev) => {
+            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+                dev.check_power();
+                dev.on("power", (pwr) => {
+                    //self.log(self.name + self.sname + " power is on - " + pwr);
+                    dev.exit();
+                    if (!pwr) {
+                        self.powered = false;
+                    } else {
+                        self.powered = true;
+                    }
+                });
+            } else {
+                dev.exit();
+            }
+        });
+        // self.log("[BroadLink][" + this.name + "][DEBUG]SP - getPower: " + self.powered);
+        this.BLservice.getCharacteristic(Characteristic.On).updateValue(self.powered);
+    } else if (type == 'MP') {
+        var b = new broadlink();
+        var s_index = self.sname[1];
+        // self.log("checking status for " + self.name);
+        self.discover(b);
+        b.on("deviceReady", (dev) => {
+            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+                dev.check_power();
+                dev.on("mp_power", (status_array) => {
+                    //self.log(self.name + " power is on - " + status_array[s_index - 1]);
+                    dev.exit();
+                    if (!status_array[s_index - 1]) {
+                        self.powered = false;
+                    } else {
+                        self.powered = true;
+                    }
+                });
+
+            } else {
+                dev.exit();
+            }
+        });
+        //self.log("[BroadLink][" + this.name + "][DEBUG]MP - getPower: " + self.powered);
+        this.BLservice.getCharacteristic(Characteristic.On).updateValue(self.powered);
     }
 }
