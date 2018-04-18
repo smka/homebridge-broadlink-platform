@@ -5,11 +5,8 @@
         "port": 51826,
         "pin": "031-45-154"
     },
-
-    "description": "This is an example configuration for the Broadlink MP homebridge plugin",
-
     "platforms": [{
-        "platform": "broadlinkPlatform",
+        "platform": "Broadlink-Outlets",
         "accessories": [{
                 "name": "SP2",
                 "type": "SP",
@@ -18,8 +15,7 @@
             {
                 "name": "MP1",
                 "type": "MP",
-                "mac": "CA:32:4F:77:D2:21",
-                "local_ip_address": "192.168.0.1"
+                "mac": "CA:32:4F:77:D2:21"
             }
         ]
     }]
