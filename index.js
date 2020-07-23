@@ -105,7 +105,7 @@ BroadlinkAccessory.prototype = {
 
             switchService
                 .getCharacteristic(Characteristic.OutletInUse)
-                .on('get', this.getSPState.bind(this));
+                .on('get', this.setMPstate.bind(this));
 
             informationService
                 .setCharacteristic(Characteristic.Model, 'MP')
