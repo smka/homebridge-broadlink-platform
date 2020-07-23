@@ -4,7 +4,7 @@ var broadlink = require('broadlinkjs-sm');
 module.exports = function(homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
-    homebridge.registerPlatform("homebridge-broadlink-platform", "broadlinkPlatform", broadlinkPlatform);
+    homebridge.registerPlatform("homebridge-broadlink-platform-outlet", "broadlinkPlatform", broadlinkPlatform);
 }
 
 function broadlinkPlatform(log, config, api) {

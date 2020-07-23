@@ -1,9 +1,13 @@
-# homebridge-broadlink-platform
+# homebridge-broadlink-platform-outlet
+
+A fix for homebridge-broadlink-platform so it display Outlet icon in Home app insteal od Switch icon.
+
+# Original README below
 
 Broadlink SP2/SP3 & MP1 plugin for [Homebridge](https://github.com/nfarina/homebridge/).
-Work with SP plugs and MP1 in your local network. 
+Work with SP plugs and MP1 in your local network.
 
-I've tested with two SP3 - works great! 
+I've tested with two SP3 - works great!
 Thanks to [@nitaybz](https://github.com/nitaybz) for testing and contribute for MP support.
 
 # Installation
