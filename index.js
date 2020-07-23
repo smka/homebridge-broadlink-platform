@@ -4,7 +4,7 @@ var broadlink = require('broadlinkjs-sm');
 module.exports = function(homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
-    homebridge.registerPlatform("homebridge-broadlink-platform-outlet", "broadlinkPlatform", broadlinkPlatform);
+    homebridge.registerPlatform("homebridge-broadlink-platform-outlet", "broadlinkPlatformOutlet", broadlinkPlatform);
 }
 
 function broadlinkPlatform(log, config, api) {
@@ -105,7 +105,7 @@ BroadlinkAccessory.prototype = {
 
             switchService
                 .getCharacteristic(Characteristic.OutletInUse)
-                .on('get', this.setMPstate.bind(this));
+                .on('get', this.getMPstate.bind(this));
 
             informationService
                 .setCharacteristic(Characteristic.Model, 'MP')

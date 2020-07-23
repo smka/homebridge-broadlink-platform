@@ -9,7 +9,7 @@
     "description": "This is an example configuration for the Broadlink MP homebridge plugin",
 
     "platforms": [{
-        "platform": "broadlinkPlatform",
+        "platform": "broadlinkPlatformOutlet",
         "accessories": [{
                 "name": "SP2",
                 "type": "SP",
