@@ -14,7 +14,6 @@ function broadlinkPlatform(log, config, api) {
     if (api) {
         this.api = api;
     }
-
 }
 
 broadlinkPlatform.prototype = {
@@ -82,31 +81,37 @@ BroadlinkAccessory.prototype = {
             .setCharacteristic(Characteristic.Manufacturer, 'Broadlink');
 
         if (type == 'SP') {
-            var switchService = new Service.Switch(this.name);
+            var switchService = new Service.Outlet(this.name);
             switchService
                 .getCharacteristic(Characteristic.On)
                 .on('get', this.getSPState.bind(this))
                 .on('set', this.setSPState.bind(this));
+
+            switchService
+                .getCharacteristic(Characteristic.OutletInUse)
+                .on('get', this.getSPState.bind(this));
 
             informationService
                 .setCharacteristic(Characteristic.Model, 'SP')
                 .setCharacteristic(Characteristic.SerialNumber, '1.0');
 
             services.push(switchService, informationService);
-
         } else if (type == 'MP') {
-            var switchService = new Service.Switch(this.sname);
+            var switchService = new Service.Outlet(this.sname);
             switchService
                 .getCharacteristic(Characteristic.On)
                 .on('get', this.getMPstate.bind(this))
                 .on('set', this.setMPstate.bind(this));
+
+            switchService
+                .getCharacteristic(Characteristic.OutletInUse)
+                .on('get', this.getSPState.bind(this));
 
             informationService
                 .setCharacteristic(Characteristic.Model, 'MP')
                 .setCharacteristic(Characteristic.SerialNumber, this.sname);
 
             services.push(switchService, informationService);
-
         }
 
         return services;
@@ -144,7 +149,6 @@ BroadlinkAccessory.prototype = {
         var checkAgainSP = setInterval(function() {
             self.discover(b);
         }, 1000)
-
     },
 
     setSPState: function(state, callback) {
@@ -230,9 +234,7 @@ BroadlinkAccessory.prototype = {
         var checkAgain = setInterval(function() {
             //self.log("Discovering Again for Status... " + self.sname);
             self.discover(b);
-        }, 1000)
-
-
+        }, 1000);
     },
 
     setMPstate: function(state, callback) {
