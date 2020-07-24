@@ -1,6 +1,6 @@
 # homebridge-broadlink-platform-outlet
 
-A fix for homebridge-broadlink-platform so it display Outlet icon in Home app insteal od Switch icon.
+A small fix for homebridge-broadlink-platform so it display Outlet icon in Home app instead of Switch icon. Based on https://github.com/smka/homebridge-broadlink-platform
 
 # Original README below
 
