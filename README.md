@@ -1,18 +1,16 @@
-# homebridge-broadlink-platform-outlet
+<p align="center">
 
-A small fix for homebridge-broadlink-platform so it display Outlet icon in Home app instead of Switch icon. Based on https://github.com/smka/homebridge-broadlink-platform
+<img src="https://github.com/homebridge/branding/raw/master/logos/homebridge-wordmark-logo-vertical.png" width="150">
 
-# Original README below
+</p>
 
-Broadlink SP2/SP3 & MP1 plugin for [Homebridge](https://github.com/nfarina/homebridge/).
-Work with SP plugs and MP1 in your local network.
+# Homebridge Broadling Platform Outlet
 
-I've tested with two SP3 - works great!
-Thanks to [@nitaybz](https://github.com/nitaybz) for testing and contribute for MP support.
+Original plugins from [@smka](https://github.com/smka/homebridge-broadlink-platform) to support Broadlink SP2/SP3 & MP1 in [Homebridge](https://github.com/nfarina/homebridge/). Work with SP plugs and MP1 in your local network. The only difference between this and the original plugins are this plugins will display outlet instead of switch icon, I also added Homebridge Config UI X support for configuring your devices.
 
 # Installation
-0. Config your SP or MP devices with default e-Control app (for the first time)
+0. Config your SP or MP devices with default Broadlink / e-Control app (for the first time)
 1. Install homebridge using: `(sudo) npm install -g homebridge`
-2. Install this plugin using: `(sudo) npm install -g homebridge-broadlink-platform`
-3. Update your configuration file. See example: `config-sample.json`. (type may be "SP" or "MP" only)
-4. Now you can turn on/off your SP and MP devices using homebridge, homekit and siri.
+2. Install this plugin using: `(sudo) npm install -g homebridge-broadlink-platform-outlet`
+3. Update your configuration file. See example: `config-sample.json`. (type may be "SP" or "MP" only) or you can use Homebridge Config UI X to configure your devices.
+4. Now you can turn on/off your SP and MP devices using homebridge, homeKit and Siri.

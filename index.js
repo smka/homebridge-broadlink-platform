@@ -25,7 +25,7 @@ broadlinkPlatform.prototype = {
         for (var i = 0; i < foundAccessories.length; i++) {
             if (foundAccessories[i].type == "MP") {
                 for (var a = 1; a <= 4; a++) {
-                    foundAccessories[i].sname = "s" + a;
+                    foundAccessories[i].sname = "S" + a;
                     var accessory = new BroadlinkAccessory(this.log, foundAccessories[i]);
                     myAccessories.push(accessory);
                     this.log('Created ' + accessory.name + ' ' + accessory.sname + ' Accessory');
@@ -131,7 +131,7 @@ BroadlinkAccessory.prototype = {
             if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
                 dev.check_power();
                 dev.on("power", (pwr) => {
-                    self.log(self.name + self.sname + " power is on - " + pwr);
+                    self.log(self.name + " " + self.sname + " power is on - " + pwr);
                     dev.exit();
                     clearInterval(checkAgainSP)
                     if (!pwr) {

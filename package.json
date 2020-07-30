@@ -1,10 +1,10 @@
 {
   "name": "homebridge-broadlink-platform-outlet",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Homebridge plugin for Broadlink SP2/3 & MP1",
   "main": "index.js",
   "scripts": {
-    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+    "watch": "npm link && nodemon"
   },
   "repository": {
     "type": "git",
