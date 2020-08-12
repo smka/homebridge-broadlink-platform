@@ -62,15 +62,15 @@
 							"items": [
 								{
 									"key": "accessories[].name",
-									"flex": "3 3 50px"
+									"flex": "3 1 100px"
 								},
 								{
 									"key": "accessories[].mac",
-									"flex": "3 3 50px"
+									"flex": "3 1 100px"
 								},
 								{
 									"key": "accessories[].type",
-									"flex": "1 1 50px"
+									"flex": "1 1 100px"
 								}
 							]
 						}
