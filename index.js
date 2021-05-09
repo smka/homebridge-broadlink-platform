@@ -1,5 +1,5 @@
 var Accessory, Service, Characteristic;
-var broadlink = require('broadlinkjs');
+var broadlink = require('broadlinkjs-dw');
 
 module.exports = function(homebridge) {
     Service = homebridge.hap.Service;
