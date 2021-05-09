@@ -1,5 +1,5 @@
 var Accessory, Service, Characteristic;
-var broadlink = require('broadlinkjs-sm');
+var broadlink = require('broadlinkjs');
 
 module.exports = function(homebridge) {
     Service = homebridge.hap.Service;
@@ -49,13 +49,14 @@ function BroadlinkAccessory(log, config) {
     this.ip = config.ip;
     this.mac = config.mac;
     this.powered = false;
+    this.first_time = true;
     this.local_ip_address = config.local_ip_address;
 
     if (!this.ip && !this.mac) throw new Error("You must provide a config value for 'ip' or 'mac'.");
 
     // MAC string to MAC buffer
     this.mac_buff = function(mac) {
-        var mb = new Buffer(6);
+        var mb = new Buffer.alloc(6,0);
         if (mac) {
             var values = mac.split(':');
             if (!values || values.length !== 6) {
@@ -65,9 +66,8 @@ function BroadlinkAccessory(log, config) {
                 var tmpByte = parseInt(values[i], 16);
                 mb.writeUInt8(tmpByte, i);
             }
-        } else {
-            //this.log("MAC address emtpy, using IP: " + this.ip);
         }
+
         return mb;
     }
 }
@@ -76,42 +76,43 @@ BroadlinkAccessory.prototype = {
     getServices: function() {
         var type = this.config.type;
         var services = [];
-        var informationService = new Service.AccessoryInformation();
-        informationService
+
+        this.informationService = new Service.AccessoryInformation();
+        this.informationService
             .setCharacteristic(Characteristic.Manufacturer, 'Broadlink');
 
         if (type == 'SP') {
-            var switchService = new Service.Outlet(this.name);
-            switchService
+            this.switchService = new Service.Outlet(this.name);
+            this.switchService
                 .getCharacteristic(Characteristic.On)
                 .on('get', this.getSPState.bind(this))
                 .on('set', this.setSPState.bind(this));
 
-            switchService
+            this.switchService
                 .getCharacteristic(Characteristic.OutletInUse)
                 .on('get', this.getSPState.bind(this));
 
-            informationService
+            this.informationService
                 .setCharacteristic(Characteristic.Model, 'SP')
                 .setCharacteristic(Characteristic.SerialNumber, '1.0');
 
-            services.push(switchService, informationService);
+            services.push(this.switchService, this.informationService);
         } else if (type == 'MP') {
-            var switchService = new Service.Outlet(this.sname);
-            switchService
+            this.switchService = new Service.Outlet(this.sname);
+            this.switchService
                 .getCharacteristic(Characteristic.On)
                 .on('get', this.getMPstate.bind(this))
                 .on('set', this.setMPstate.bind(this));
 
-            switchService
+            this.switchService
                 .getCharacteristic(Characteristic.OutletInUse)
                 .on('get', this.getMPstate.bind(this));
 
-            informationService
+            this.informationService
                 .setCharacteristic(Characteristic.Model, 'MP')
                 .setCharacteristic(Characteristic.SerialNumber, this.sname);
 
-            services.push(switchService, informationService);
+            services.push(this.switchService, this.informationService);
         }
 
         return services;
@@ -125,168 +126,130 @@ BroadlinkAccessory.prototype = {
     getSPState: function(callback) {
         var self = this;
         var b = new broadlink();
+        var checkAgain;
+
         self.discover(b);
+        checkAgain = setInterval(function() {
+            self.discover(b);
+        }, 1000);
 
         b.on("deviceReady", (dev) => {
             if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
                 dev.check_power();
                 dev.on("power", (pwr) => {
-                    self.log(self.name + " " + self.sname + " power is on - " + pwr);
                     dev.exit();
-                    clearInterval(checkAgainSP)
-                    if (!pwr) {
-                        self.powered = false;
-                        return callback(null, false);
-                    } else {
-                        self.powered = true;
-                        return callback(null, true);
+
+                    if(self.first_time || self.powered !== pwr) {
+                        self.first_time = false;
+                        self.powered = pwr? true: false;
+                        self.switchService.setCharacteristic(Characteristic.On, self.powered);
+
+                        self.log(self.name + " " + self.sname + " is: " + (self.powered? "ON": "OFF"));
                     }
+
+                    clearInterval(checkAgain)
                 });
             } else {
                 dev.exit();
             }
         });
-        var checkAgainSP = setInterval(function() {
-            self.discover(b);
-        }, 1000)
+
+        callback(null, self.powered);
     },
 
     setSPState: function(state, callback) {
         var self = this;
+        var s_index = self.sname[1];
         var b = new broadlink();
-        self.discover(b);
+        var checkAgain;
 
-        self.log("set SP state: " + state);
-        if (state) {
-            if (self.powered) {
-                return callback(null, true)
-            } else {
-                b.on("deviceReady", (dev) => {
-                    if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                        self.log("ON!");
-                        dev.set_power(true);
-                        dev.exit();
-                        clearInterval(checkAgainSPset)
-                        self.powered = true;
-                        return callback(null, true);
-                    } else {
-                        dev.exit();
-                    }
-                });
-                var checkAgainSPset = setInterval(function() {
-                    self.discover(b);
-                }, 1000)
-            }
-        } else {
-            if (self.powered) {
-                b.on("deviceReady", (dev) => {
-                    if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                        self.log("OFF!");
-                        dev.set_power(false);
-                        dev.exit();
-                        clearInterval(checkAgainSPset)
-                        self.powered = false;
-                        return callback(null, false);
-                    } else {
-                        dev.exit();
-                    }
-                });
-                var checkAgainSPset = setInterval(function() {
-                    self.discover(b);
-                }, 1000)
-            } else {
-                return callback(null, false)
-            }
+        if (state !== self.powered) {
+            self.discover(b);
+
+            checkAgain = setInterval(function() {
+                self.discover(b);
+            }, 1000);
         }
+
+        b.on("deviceReady", (dev) => {
+            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+                self.powered = state;
+
+                dev.set_power(self.powered);
+
+                self.log(self.name + " is: " + (self.powered? "ON": "OFF"));
+                clearInterval(checkAgain);
+            }
+
+            dev.exit();
+        });
+
+        callback(null);
     },
 
     getMPstate: function(callback) {
         var self = this;
         var b = new broadlink();
         var s_index = self.sname[1];
-        self.log("checking status for " + self.name);
-        self.discover(b);
-        b.on("deviceReady", (dev) => {
-            //self.log("detected device type:" + dev.type + " @ " + dev.host.address);
-            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                //self.log("deviceReady for " + self.name);
-                dev.check_power();
-                dev.on("mp_power", (status_array) => {
-                    //self.log("Status is ready for " + self.name);
-                    self.log(self.name + " power is on - " + status_array[s_index - 1]);
-                    dev.exit();
-                    //self.log("MP1 Exited for " + self.sname);
-                    clearInterval(checkAgain);
-                    if (!status_array[s_index - 1]) {
-                        self.powered = false;
-                        return callback(null, false);
-                    } else {
-                        self.powered = true;
-                        return callback(null, true);
-                    }
-                });
+        var checkAgain;
 
-            } else {
-                dev.exit();
-                //self.log("exited device type:" + dev.type + " @ " + dev.host.address);
-            }
-        });
-        var checkAgain = setInterval(function() {
-            //self.log("Discovering Again for Status... " + self.sname);
+        self.discover(b);
+        checkAgain = setInterval(function() {
             self.discover(b);
         }, 1000);
+
+        b.on("deviceReady", (dev) => {
+            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+                dev.check_power();
+
+                dev.on("mp_power", (status_array) => {
+                    dev.exit();
+
+                    if(self.first_time || self.powered !== status_array[s_index - 1]) {
+                        self.first_time = false;
+                        self.powered = status_array[s_index - 1]? true: false;
+                        self.switchService.setCharacteristic(Characteristic.On, self.powered);
+
+                        self.log(self.name + " is: " + (self.powered? "ON": "OFF"));
+                    }
+
+                    clearInterval(checkAgain);
+                });
+            } else {
+                dev.exit();
+            }
+        });
+
+        callback(null, self.powered);
     },
 
     setMPstate: function(state, callback) {
         var self = this;
         var s_index = self.sname[1];
         var b = new broadlink();
+        var checkAgain;
 
-        self.log("set " + self.sname + " state to " + state);
-        if (state) {
-            if (self.powered) {
-                return callback(null, true);
-            } else {
+        if (state !== self.powered) {
+            self.discover(b);
+
+            checkAgain = setInterval(function() {
                 self.discover(b);
-                b.on("deviceReady", (dev) => {
-                    if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                        self.log(self.sname + " is ON!");
-                        dev.set_power(s_index, true);
-                        dev.exit();
-                        clearInterval(checkAgainSet);
-                        self.powered = true;
-                        return callback(null, true);
-                    } else {
-                        dev.exit();
-                    }
-                });
-                var checkAgainSet = setInterval(function() {
-                    //self.log("Discovering Again for Set Command... " + self.sname);
-                    self.discover(b);
-                }, 1000)
-            }
-        } else {
-            if (self.powered) {
-                self.discover(b);
-                b.on("deviceReady", (dev) => {
-                    if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
-                        self.log(self.sname + " is OFF!");
-                        dev.set_power(s_index, false);
-                        dev.exit();
-                        clearInterval(checkAgainSet);
-                        self.powered = false;
-                        return callback(null, false);
-                    } else {
-                        dev.exit();
-                    }
-                });
-                var checkAgainSet = setInterval(function() {
-                    //self.log("Discovering Again for Set Command... " + self.sname);
-                    self.discover(b);
-                }, 1000)
-            } else {
-                return callback(null, false)
-            }
+            }, 1000);
         }
+
+        b.on("deviceReady", (dev) => {
+            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+                self.powered = state;
+
+                dev.set_power(s_index, self.powered);
+
+                self.log(self.name + " is: " + (self.powered? "ON": "OFF"));
+                clearInterval(checkAgain);
+            }
+
+            dev.exit();
+        });
+
+        callback(null);
     }
 }
