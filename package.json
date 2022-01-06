@@ -1,6 +1,6 @@
 {
   "name": "homebridge-broadlink-platform-outlet",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Homebridge plugin for Broadlink SP2/3 & MP1",
   "main": "index.js",
   "scripts": {
@@ -25,12 +25,11 @@
   },
   "author": "dwaan",
   "license": "MIT",
-  "dependencies": {
-    "broadlinkjs-dw": "^0.1.1"
-  },
   "bugs": {
     "url": "https://github.com/dwaan/homebridge-broadlink-platform/issues"
   },
   "homepage": "https://github.com/dwaan/homebridge-broadlink-platform#readme",
-  "devDependencies": {}
+  "dependencies": {
+    "broadlinkjs-dw": "^0.1.4"
+  }
 }

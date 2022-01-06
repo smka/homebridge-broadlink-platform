@@ -1,4 +1,4 @@
-var Accessory, Service, Characteristic;
+var Service, Characteristic;
 var broadlink = require('broadlinkjs-dw');
 
 module.exports = function(homebridge) {
