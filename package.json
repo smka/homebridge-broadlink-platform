@@ -20,8 +20,8 @@
     "sp"
   ],
   "engines": {
-    "node": ">=0.12.0",
-    "homebridge": ">=0.2.0"
+    "node": ">=12.0.0",
+    "homebridge": ">=1.0.0"
   },
   "author": "dwaan",
   "license": "MIT",
@@ -30,6 +30,6 @@
   },
   "homepage": "https://github.com/dwaan/homebridge-broadlink-platform#readme",
   "dependencies": {
-    "broadlinkjs-dw": "^0.1.4"
+    "broadlinkjs-dw": ">=0.1.4"
   }
 }
