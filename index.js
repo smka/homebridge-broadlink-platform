@@ -22,19 +22,23 @@ broadlinkPlatform.prototype = {
         var foundAccessories = this.config.accessories;
         var myAccessories = [];
 
-        for (var i = 0; i < foundAccessories.length; i++) {
-            if (foundAccessories[i].type == "MP") {
-                for (var a = 1; a <= 4; a++) {
-                    foundAccessories[i].sname = "S" + a;
+        if(foundAccessories) {
+            for (var i = 0; i < foundAccessories.length; i++) {
+                if (foundAccessories[i].type == "MP") {
+                    for (var a = 1; a <= 4; a++) {
+                        foundAccessories[i].sname = "S" + a;
+                        var accessory = new BroadlinkAccessory(this.log, foundAccessories[i]);
+                        myAccessories.push(accessory);
+                        this.log('Created ' + accessory.name + ' ' + accessory.sname + ' Accessory');
+                    }
+                } else {
                     var accessory = new BroadlinkAccessory(this.log, foundAccessories[i]);
                     myAccessories.push(accessory);
-                    this.log('Created ' + accessory.name + ' ' + accessory.sname + ' Accessory');
+                    this.log('Created ' + accessory.name + ' Accessory');
                 }
-            } else {
-                var accessory = new BroadlinkAccessory(this.log, foundAccessories[i]);
-                myAccessories.push(accessory);
-                this.log('Created ' + accessory.name + ' Accessory');
             }
+        } else {
+            this.log('No accesories found in your config");
         }
         callback(myAccessories);
     }
