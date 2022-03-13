@@ -21,24 +21,21 @@ broadlinkPlatform.prototype = {
         //For each device in cfg, create an accessory!
         var foundAccessories = this.config.accessories;
         var myAccessories = [];
+        var length = foundAccessories ? foundAccessories.length : 0;
 
-        if(foundAccessories) {
-            for (var i = 0; i < foundAccessories.length; i++) {
-                if (foundAccessories[i].type == "MP") {
-                    for (var a = 1; a <= 4; a++) {
-                        foundAccessories[i].sname = "S" + a;
-                        var accessory = new BroadlinkAccessory(this.log, foundAccessories[i]);
-                        myAccessories.push(accessory);
-                        this.log('Created ' + accessory.name + ' ' + accessory.sname + ' Accessory');
-                    }
-                } else {
+        for (var i = 0; i < length; i++) {
+            if (foundAccessories[i].type == "MP") {
+                for (var a = 1; a <= 4; a++) {
+                    foundAccessories[i].sname = "S" + a;
                     var accessory = new BroadlinkAccessory(this.log, foundAccessories[i]);
                     myAccessories.push(accessory);
-                    this.log('Created ' + accessory.name + ' Accessory');
+                    this.log('Created ' + accessory.name + ' ' + accessory.sname + ' Accessory');
                 }
+            } else {
+                var accessory = new BroadlinkAccessory(this.log, foundAccessories[i]);
+                myAccessories.push(accessory);
+                this.log('Created ' + accessory.name + ' Accessory');
             }
-        } else {
-            this.log('No accesories found in your config");
         }
         callback(myAccessories);
     }
