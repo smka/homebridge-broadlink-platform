@@ -11,7 +11,7 @@ function broadlinkPlatform(log, config, api) {
     this.log = log;
     this.config = config;
 
-    if (api) {
+    if(api) {
         this.api = api;
     }
 }
@@ -24,7 +24,7 @@ broadlinkPlatform.prototype = {
         var length = foundAccessories ? foundAccessories.length : 0;
 
         for (var i = 0; i < length; i++) {
-            if (foundAccessories[i].type == "MP") {
+            if(foundAccessories[i].type == "MP") {
                 for (var a = 1; a <= 4; a++) {
                     foundAccessories[i].sname = "S" + a;
                     var accessory = new BroadlinkAccessory(this.log, foundAccessories[i]);
@@ -53,14 +53,14 @@ function BroadlinkAccessory(log, config) {
     this.first_time = true;
     this.local_ip_address = config.local_ip_address;
 
-    if (!this.ip && !this.mac) throw new Error("You must provide a config value for 'ip' or 'mac'.");
+    if(!this.ip && !this.mac) throw new Error("You must provide a config value for 'ip' or 'mac'.");
 
     // MAC string to MAC buffer
     this.mac_buff = function(mac) {
         var mb = new Buffer.alloc(6,0);
-        if (mac) {
+        if(mac) {
             var values = mac.split(':');
-            if (!values || values.length !== 6) {
+            if(!values || values.length !== 6) {
                 throw new Error('Invalid MAC [' + mac + ']; should follow pattern ##:##:##:##:##:##');
             }
             for (var i = 0; i < values.length; ++i) {
@@ -82,7 +82,7 @@ BroadlinkAccessory.prototype = {
         this.informationService
             .setCharacteristic(Characteristic.Manufacturer, 'Broadlink');
 
-        if (type == 'SP') {
+        if(type == 'SP') {
             this.switchService = new Service.Outlet(this.name);
             this.switchService
                 .getCharacteristic(Characteristic.On)
@@ -98,7 +98,7 @@ BroadlinkAccessory.prototype = {
                 .setCharacteristic(Characteristic.SerialNumber, '1.0');
 
             services.push(this.switchService, this.informationService);
-        } else if (type == 'MP') {
+        } else if(type == 'MP') {
             this.switchService = new Service.Outlet(this.sname);
             this.switchService
                 .getCharacteristic(Characteristic.On)
@@ -135,7 +135,7 @@ BroadlinkAccessory.prototype = {
         }, 1000);
 
         b.on("deviceReady", (dev) => {
-            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+            if(self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
                 dev.check_power();
                 dev.on("power", (pwr) => {
                     dev.exit();
@@ -160,11 +160,10 @@ BroadlinkAccessory.prototype = {
 
     setSPState: function(state, callback) {
         var self = this;
-        var s_index = self.sname[1];
         var b = new broadlink();
         var checkAgain;
 
-        if (state !== self.powered) {
+        if(state !== self.powered) {
             self.discover(b);
 
             checkAgain = setInterval(function() {
@@ -173,7 +172,7 @@ BroadlinkAccessory.prototype = {
         }
 
         b.on("deviceReady", (dev) => {
-            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+            if(self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
                 self.powered = state;
 
                 dev.set_power(self.powered);
@@ -200,7 +199,7 @@ BroadlinkAccessory.prototype = {
         }, 1000);
 
         b.on("deviceReady", (dev) => {
-            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+            if(self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
                 dev.check_power();
 
                 dev.on("mp_power", (status_array) => {
@@ -230,7 +229,7 @@ BroadlinkAccessory.prototype = {
         var b = new broadlink();
         var checkAgain;
 
-        if (state !== self.powered) {
+        if(state !== self.powered) {
             self.discover(b);
 
             checkAgain = setInterval(function() {
@@ -239,7 +238,7 @@ BroadlinkAccessory.prototype = {
         }
 
         b.on("deviceReady", (dev) => {
-            if (self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
+            if(self.mac_buff(self.mac).equals(dev.mac) || dev.host.address == self.ip) {
                 self.powered = state;
 
                 dev.set_power(s_index, self.powered);
