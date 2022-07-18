@@ -120,6 +120,11 @@ BroadlinkAccessory.prototype = {
 
     // Get MP/SP outlets status
     getState: function (callback) {
+        if (this.onGetState || this.onSetState) {
+            if (callback) callback(null, this.powered);
+            return;
+        }
+
         var device = new broadlink();
 
         this.onGetState = true;
@@ -148,7 +153,7 @@ BroadlinkAccessory.prototype = {
             device = null;
         });
 
-        callback(null, this.powered);
+        if (callback) callback(null, this.powered);
     },
 
     // Set MP/SP outlets status
@@ -199,9 +204,10 @@ BroadlinkAccessory.prototype = {
 
     // Update outlets status based on the last status
     updateState: function () {
-        setInterval(() => {
-            if (!this.onGetState && !this.onSetState) this.getState(() => { });
-            // this.log(`[${this.name}] - On get: ${this.onGetState}, On set: ${this.onSetState}`)
+        if (this.mainInterval) clearInterval(this.mainInterval);
+
+        this.mainInterval = setInterval(() => {
+            this.getState();
         }, this.interval);
     },
 
