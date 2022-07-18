@@ -27,8 +27,18 @@
 							"placeholder": "Choose your device type",
 							"default": "MP",
 							"oneOf": [
-								{ "title": "MP", "enum": ["MP"] },
-								{ "title": "SP2/SP3", "enum": ["SP"] }
+								{
+									"title": "MP",
+									"enum": [
+										"MP"
+									]
+								},
+								{
+									"title": "SP2/SP3",
+									"enum": [
+										"SP"
+									]
+								}
 							],
 							"required": true
 						},
@@ -45,15 +55,31 @@
 							"placeholder": "Timer Type",
 							"default": "DISABLE",
 							"oneOf": [
-								{ "title": "Disable", "enum": ["DISABLE"] },
-								{ "title": "On After", "enum": ["ONAFTER"] },
-								{ "title": "Off After", "enum": ["OFFAFTER"] }
+								{
+									"title": "Disable",
+									"enum": [
+										"DISABLE"
+									]
+								},
+								{
+									"title": "On After",
+									"enum": [
+										"ONAFTER"
+									]
+								},
+								{
+									"title": "Off After",
+									"enum": [
+										"OFFAFTER"
+									]
+								}
 							]
 						},
-						"timer": {
-							"type": "string",
-							"title": "Timer (ms)",
-							"placeholder": "Eg: 1000"
+						"interval": {
+							"type": "number",
+							"title": "Update Interval (ms)",
+							"placeholder": "Eg: 3000",
+							"required": true
 						}
 					}
 				}
@@ -76,14 +102,25 @@
 							"items": [
 								{
 									"key": "accessories[].name",
-									"flex": "3 1 100px"
+									"flex": "1 1 100px"
 								},
 								{
 									"key": "accessories[].mac",
-									"flex": "2 1 100px"
-								},
+									"flex": "1 1 100px"
+								}
+							]
+						},
+						{
+							"type": "flex",
+							"displayFlex": true,
+							"flex-direction": "row",
+							"items": [
 								{
 									"key": "accessories[].type",
+									"flex": "1 1 100px"
+								},
+								{
+									"key": "accessories[].interval",
 									"flex": "1 1 100px"
 								}
 							]
