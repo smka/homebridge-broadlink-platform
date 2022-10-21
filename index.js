@@ -13,8 +13,7 @@ class broadlinkPlatform {
     constructor(log, config, api) {
         this.log = log;
         this.config = config;
-        if (api)
-            this.api = api;
+        if (api) this.api = api;
     }
     accessories(callback) {
         //For each device in cfg, create an accessory!
@@ -124,6 +123,7 @@ class broadlinkAccessory {
         return new Promise(async (resolve) => {
             var device = new broadlink();
             var checkAgain;
+            var timeout;
 
             // Find device
             this.discover(device);
@@ -131,9 +131,19 @@ class broadlinkAccessory {
                 this.discover(device);
             }, 1000);
 
+            timeout = setTimeout(() => {
+                clearTimeout(timeout);
+                clearInterval(checkAgain);
+                device = null;
+
+                // return empty device
+                resolve(null);
+            }, 5000);
+
             // Device is ready
             device.on("deviceReady", (dev) => {
                 if (this.mac_buff(this.mac).equals(dev.mac)) {
+                    clearTimeout(timeout);
                     clearInterval(checkAgain);
                     device = null;
 
@@ -147,6 +157,7 @@ class broadlinkAccessory {
     // Initiialized device
     async _initDevice() {
         this.device = await this._getDevice();
+        if (!this.device) return;
 
         // When recived power
         this.device.on(this.type == MP ? "mp_power" : "power", (statuses) => {
@@ -160,8 +171,6 @@ class broadlinkAccessory {
 
                 this.logState();
             }
-
-            this.onGetState = false;
         });
     }
 
@@ -172,23 +181,31 @@ class broadlinkAccessory {
 
     // Set MP/SP outlets status
     async setState(state, callback) {
-        // Initialized device if it get disconnected
-        if (!this.device) await this._initDevice();
+        if (!this.onSetState) {
+            this.onSetState = true;
 
-        // Log state
-        this.log(`[${this.name}] 👈`);
+            // Initialized device if it get disconnected
+            if (!this.device) await this._initDevice();
 
-        // Set the power
-        this.powered = state ? true : false;
-        if (this.type == MP) this.device.set_power(this.index, this.powered);
-        else this.device.set_power(this.powered);
-        this.switchService.updateCharacteristic(Characteristic.On, this.powered);
+            if (this.device) {
+                // Log state
+                this.log(`[${this.name}] 👈`);
 
-        // Log state
-        this.logState();
+                // Set the power
+                this.powered = state ? true : false;
+                if (this.type == MP) this.device.set_power(this.index, this.powered);
+                else this.device.set_power(this.powered);
+                this.switchService.updateCharacteristic(Characteristic.On, this.powered);
 
-        // Send check power command
-        this.device.check_power();
+                // Log state
+                this.logState();
+
+                // Send check power command
+                this.device.check_power();
+            }
+        }
+
+        this.onSetState = false;
 
         // Callback;
         callback(null);
@@ -199,13 +216,17 @@ class broadlinkAccessory {
         // Send check power command and loop it
         if (this.mainInterval) clearInterval(this.mainInterval);
         this.mainInterval = setInterval(async () => {
-            this.onGetState = true;
+            if (!this.onGetState) {
+                this.onGetState = true;
 
-            // Initialized device if it get disconnected
-            if (!this.device) await this._initDevice();
+                // Initialized device if it get disconnected
+                if (!this.device) await this._initDevice();
 
-            // Send check power command
-            this.device.check_power();
+                // Send check power command
+                if (this.device) this.device.check_power();
+
+                this.onGetState = false;
+            }
         }, this.interval);
     }
 
