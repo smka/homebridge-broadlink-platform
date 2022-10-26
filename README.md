@@ -1,7 +1,9 @@
+[![npm-version](https://badgen.net/npm/v/homebridge-broadlink-platform)](https://www.npmjs.com/package/homebridge-broadlink-platform)
+[![npm-total-downloads](https://badgen.net/npm/dt/homebridge-broadlink-platform)](https://www.npmjs.com/package/homebridge-broadlink-platform)
+[![Donate](https://badgen.net/badge/buymeacoffee/donate?icon=https://ico.now.sh/buymeacoffee/fff)](https://www.buymeacoffee.com/dwaan)
+
 <p align="center">
-
 <img src="https://github.com/homebridge/branding/raw/master/logos/homebridge-wordmark-logo-vertical.png" width="150">
-
 </p>
 
 # Homebridge Broadlink Platform Outlet
