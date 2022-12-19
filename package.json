@@ -1,14 +1,15 @@
 {
-  "name": "homebridge-broadlink-platform",
-  "version": "0.1.0",
-  "description": "Homebridge plugin for Broadlink SP2/3 & MP1",
+  "name": "homebridge-broadlink-platform-outlet",
+  "version": "1.1.1",
+  "description": "Homebridge plugin for Broadlink MP1 and SP2/3",
   "main": "index.js",
   "scripts": {
-    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+    "watch": "npm link && nodemon",
+    "test": "npm link && homebridge -I -D"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/smka/homebridge-broadlink-platform.git"
+    "url": "git+https://github.com/dwaan/homebridge-broadlink-platform.git"
   },
   "keywords": [
     "homebridge-plugin",
@@ -20,17 +21,16 @@
     "sp"
   ],
   "engines": {
-    "node": ">=0.12.0",
-    "homebridge": ">=0.2.0"
+    "node": ">=12.0.0",
+    "homebridge": ">=1.3.0"
   },
-  "author": "smka",
+  "author": "dwaan",
   "license": "MIT",
-  "dependencies": {
-    "broadlinkjs-sm": ">=0.1.5"
-  },
   "bugs": {
-    "url": "https://github.com/smka/homebridge-broadlink-platform/issues"
+    "url": "https://github.com/dwaan/homebridge-broadlink-platform/issues"
   },
-  "homepage": "https://github.com/smka/homebridge-broadlink-platform#readme",
-  "devDependencies": {}
+  "homepage": "https://github.com/dwaan/homebridge-broadlink-platform#readme",
+  "dependencies": {
+    "broadlinkjs-dw": "^0.1.12"
+  }
 }

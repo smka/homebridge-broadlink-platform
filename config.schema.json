@@ -1,0 +1,133 @@
+{
+	"pluginAlias": "broadlinkPlatformOutlet",
+	"pluginType": "platform",
+	"singular": true,
+	"headerDisplay": "Homebridge plugin for Broadlink SP2/3 & MP1",
+	"footerDisplay": "For more information, see the [README](https://github.com/dwaan/homebridge-broadlink-platform/blob/master/README.md)",
+	"schema": {
+		"type": "object",
+		"properties": {
+			"accessories": {
+				"title": "Devices",
+				"type": "array",
+				"required": true,
+				"items": {
+					"type": "object",
+					"properties": {
+						"name": {
+							"type": "string",
+							"title": "Device Name",
+							"placeholder": "Eg: MP1",
+							"minLength": 1,
+							"required": true
+						},
+						"type": {
+							"type": "string",
+							"title": "Device Type",
+							"placeholder": "Choose your device type",
+							"default": "MP",
+							"oneOf": [
+								{
+									"title": "MP",
+									"enum": [
+										"MP"
+									]
+								},
+								{
+									"title": "SP2/SP3",
+									"enum": [
+										"SP"
+									]
+								}
+							],
+							"required": true
+						},
+						"mac": {
+							"type": "string",
+							"title": "MAC Address",
+							"placeholder": "Eg: A4:AE:3B:F1:E3:65",
+							"pattern": "^([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}$",
+							"required": true
+						},
+						"timertype": {
+							"type": "string",
+							"title": "Timer Type",
+							"placeholder": "Timer Type",
+							"default": "DISABLE",
+							"oneOf": [
+								{
+									"title": "Disable",
+									"enum": [
+										"DISABLE"
+									]
+								},
+								{
+									"title": "On After",
+									"enum": [
+										"ONAFTER"
+									]
+								},
+								{
+									"title": "Off After",
+									"enum": [
+										"OFFAFTER"
+									]
+								}
+							]
+						},
+						"interval": {
+							"type": "number",
+							"title": "Update Interval (ms)",
+							"placeholder": "Eg: 3000",
+							"required": true
+						}
+					}
+				}
+			}
+		}
+	},
+	"layout": [
+		{
+			"key": "accessories",
+			"type": "array",
+			"items": [
+				{
+					"type": "flex",
+					"displayFlex": true,
+					"items": [
+						{
+							"type": "flex",
+							"displayFlex": true,
+							"flex-direction": "row",
+							"items": [
+								{
+									"key": "accessories[].name",
+									"flex": "1 1 100px"
+								},
+								{
+									"key": "accessories[].mac",
+									"flex": "1 1 100px"
+								}
+							]
+						},
+						{
+							"type": "flex",
+							"displayFlex": true,
+							"flex-direction": "row",
+							"items": [
+								{
+									"key": "accessories[].type",
+									"flex": "1 1 100px"
+								},
+								{
+									"key": "accessories[].interval",
+									"flex": "1 1 100px"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}
